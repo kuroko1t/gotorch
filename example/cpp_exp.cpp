@@ -43,6 +43,7 @@ int main() {
       // Reset gradients.
       optimizer.zero_grad();
       // Execute the model on the input data.
+      std::cout << typeid(batch).name() << std::endl;
       torch::Tensor prediction = net->forward(batch.data);
       // Compute a loss value to judge the prediction of our model.
       torch::Tensor loss = torch::nll_loss(prediction, batch.target);
