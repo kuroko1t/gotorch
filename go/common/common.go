@@ -4,11 +4,12 @@ package torch
 // #cgo LDFLAGS: -L${SRCDIR}/../../libtorch/lib -L${SRCDIR}/../../build -lgotorch -lpthread -lcaffe2 -lc10 -ltorch -lstdc++
 // #include "gotorch.h"
 import "C"
-
+//import "reflect"
 //import "unsafe"
+import "fmt"
 
-type MnistData struct {
-	cmdata C.MnistDataSet
+type ExampleData struct {
+	dataset C.ExampleDataSet
 }
 
 //func (mdata MnistData) Loader_to_Tensor() GoTensor {
@@ -33,6 +34,10 @@ func (tensor GoTensor) Reshape(shapes []int) GoTensor {
 	ret_tensor := GoTensor{}
 	ret_tensor.tensor = C.tensor_reshape(tensor.tensor, &cshapes[0], C.int(len(shapes)))
 	return ret_tensor
+}
+
+func (tensor GoTensor) Item() float32 {
+	return float32(C.tensor_item(tensor.tensor))
 }
 
 type GoLinear struct {
@@ -60,13 +65,28 @@ func ModelInit() GoModel {
 	gmodel := GoModel{model:torhmodel}
 	return gmodel
 }
-func MnistDataloader(path string, batch_size int) GoTensor {
-	//data := MnistData{}
+func MnistDataloader(path string, batch_size int) ExampleData {
+	var size C.int
+	loader := C.data_loader(C.CString(path), C.int(batch_size), &size)
+	fmt.Println(size)
+	datasets := ExampleData{}
+	datasets.dataset = loader
+	//datasets := make([]ExampleDatap, size)
+	//var go_array []C.ExampleDataSet
+	//slice := (*reflect.SliceHeader)(unsafe.Pointer(&go_array))
+	//slice.Cap = int(size)
+	//slice.Len = int(size)
+	//slice.Data = uintptr(unsafe.Pointer(loader))
+	//for i := range datasets {
+	// 	datasets[i].dataset = go_array[i]
+	//}
+	return datasets;
+}
+
+func (data ExampleData) Data() GoTensor {
 	ret_gtensor := GoTensor{}
-	//data.cmdata = C.data_loader(C.CString(path), C.int(batch_size))
-	ret_gtensor.tensor = C.data_loader(C.CString(path), C.int(batch_size))
-	//return data;
-	return ret_gtensor;
+	ret_gtensor.tensor = C.loader_to_tensor(data.dataset)
+	return ret_gtensor
 }
 
 func Torch_nn_Linear(a, b int) GoLinear {
@@ -80,6 +100,13 @@ func Log_Softmax(tensor GoTensor, dim int) GoTensor {
 	ret_gtensor.tensor = C.log_softmax(tensor.tensor, C.int(dim))
 	return ret_gtensor
 }
+
+func Nll_Loss(tensor, target GoTensor) GoTensor{
+	ret_gtensor := GoTensor{}
+	ret_gtensor.tensor = C.tensor_nll_loss(tensor.tensor, target.tensor)
+	return ret_gtensor
+}
+
 
 
 //type Tensor struct {

@@ -51,30 +51,28 @@ using mnistDataset = torch::data::StatelessDataLoader<
 //  return (void*)(dataset);
 //}
 
-Tensor data_loader(const char *path, int batch_size) {
+using example_data = torch::data::Example<at::Tensor, at::Tensor>;
+
+ExampleDataSet data_loader(const char *path, int batch_size, int *size) {
   std::string spath(path);
   auto dataset = torch::data::make_data_loader(
       torch::data::datasets::MNIST(spath)
       .map(torch::data::transforms::Stack<>()),
       batch_size);
-  torch::Tensor *tensor = new torch::Tensor();
-  for (auto &x : *dataset) {
-      *tensor = (x.data);
-      break;
+  std::vector<example_data> dataset_vec;
+  for (auto x : *dataset) {
+    dataset_vec.push_back(x);
   }
-  return tensor;
+  *size = dataset_vec.size();
+  return (void*)(&dataset_vec[0]);
 }
 
-//Tensor loader_to_tensor(MnistDataSet dataset) {
-//   mnistDataset* mdataset = (mnistDataset*)dataset;
-//   torch::Tensor *tensor = new torch::Tensor();
-//   for (auto &x : *mdataset) {
-//       *tensor = (x.data);
-//       break;
-//   }
-//   //*tensor = (*(*mdataset).begin()).data;
-//   return (void*)(tensor);
-//}
+Tensor loader_to_tensor(ExampleDataSet dataset) {
+   example_data* mdataset = (example_data*)dataset;
+   torch::Tensor *tensor = new torch::Tensor();
+   *tensor = mdataset->data;
+   return (void*)(tensor);
+}
 
 int tensor_size(Tensor tensor, int dim) {
   torch::Tensor *atensor = (torch::Tensor*)tensor;
