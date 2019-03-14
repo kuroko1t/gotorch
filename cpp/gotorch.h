@@ -13,7 +13,8 @@ extern "C" {
   Linear torch_nn_Linear(int a, int b);
   Linear Register_module(const char *name, Linear liner, TModel model);
   Tensor forward(Linear mod, Tensor tensor);
-  ExampleDataSet data_loader(const char *path, int batch_size, int *size);
+  Tensor data_loader(const char *path, int batch_size,
+                     int *size, Tensor *target);
   Tensor loader_to_tensor(ExampleDataSet dataset);
 
   int tensor_size(Tensor tensor, int dim);

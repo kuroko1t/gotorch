@@ -7,9 +7,13 @@ import "C"
 //import "reflect"
 //import "unsafe"
 import "fmt"
+import "log"
+import "os"
 
 type ExampleData struct {
 	dataset C.ExampleDataSet
+	data C.Tensor
+	target C.Tensor
 }
 
 //func (mdata MnistData) Loader_to_Tensor() GoTensor {
@@ -66,11 +70,17 @@ func ModelInit() GoModel {
 	return gmodel
 }
 func MnistDataloader(path string, batch_size int) ExampleData {
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		log.Fatal(err)
+	}
 	var size C.int
-	loader := C.data_loader(C.CString(path), C.int(batch_size), &size)
-	fmt.Println(size)
 	datasets := ExampleData{}
-	datasets.dataset = loader
+	fmt.Println(datasets.data)
+	datasets.data = C.data_loader(C.CString(path), C.int(batch_size),
+		&size, &(datasets.target))
+	fmt.Println(datasets.data)
+	fmt.Println(size)
+	//datasets.dataset = loader
 	//datasets := make([]ExampleDatap, size)
 	//var go_array []C.ExampleDataSet
 	//slice := (*reflect.SliceHeader)(unsafe.Pointer(&go_array))
@@ -85,7 +95,8 @@ func MnistDataloader(path string, batch_size int) ExampleData {
 
 func (data ExampleData) Data() GoTensor {
 	ret_gtensor := GoTensor{}
-	ret_gtensor.tensor = C.loader_to_tensor(data.dataset)
+	ret_gtensor.tensor = data.data
+	//ret_gtensor.tensor = C.loader_to_tensor(data.dataset)
 	return ret_gtensor
 }
 
