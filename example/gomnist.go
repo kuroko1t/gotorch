@@ -1,6 +1,6 @@
 package main
 
-import "./common"
+import "github.com/kuroko1t/gotorch/go"
 import "fmt"
 
 func main() {
