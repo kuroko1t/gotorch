@@ -10,7 +10,7 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:`pwd`/build:`pwd`/libtorch/lib
 
 go run example/gomnist.go
 
-```
+```golang
 
 package main
 
