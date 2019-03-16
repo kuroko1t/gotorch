@@ -1,4 +1,3 @@
-
 package main
 
 import "./common"
@@ -15,18 +14,27 @@ func main() {
 	for epoch := 0; epoch < 10; epoch++ {
 		batch_index := 0
 		for dataset.Next() {
+
+			// Reset gradients.
 			optimizer.Zero_grad()
+
 			batch := dataset.Data()
-			x_re  := batch.Reshape([]int{batch.Size(0), 784})
-			x_re2 := torch.Relu(fc1.Forward(x_re))
-			x_re3 := torch.Relu(fc2.Forward(x_re2))
-			prediction := torch.Log_Softmax(fc3.Forward(x_re3), 1)
+
+			x := torch.Relu(fc1.Forward(batch.Reshape([]int{batch.Size(0), 784})))
+			x = torch.Dropout(x, 0.5, model.Is_training())
+			x = torch.Relu(fc2.Forward(x))
+
+			prediction := torch.Log_Softmax(fc3.Forward(x), 1)
 			loss := torch.Nll_loss(prediction, dataset.Target())
+
+			// Compute gradients of the loss w.r.t. the parameters of our model.
 			loss.Backward()
+
+			// Update the parameters based on the calculated gradients.
 			optimizer.Step()
 			batch_index += 1
-			if (batch_index %100==0) {
-				fmt.Println(loss.Item())
+			if batch_index%100 == 0 {
+				fmt.Println("epoch:", epoch, "batch:", batch_index, "loss:", loss.Item())
 			}
 		}
 	}

@@ -13,7 +13,10 @@ extern "C" {
   TModel modelInit();
   void params_size(TModel model, int *size);
   void params(TModel model, int size, Tensor *tensor);
-  SGD optimizer(Tensor *tensor, float lr, int size);
+  int istraining(TModel model);
+
+
+  SGD optimizer_sgd(Tensor *tensor, float lr, int size);
   void optimizer_zero_grad(SGD optimizer);
   void optimizer_step(SGD optimizer);
 
@@ -33,6 +36,7 @@ extern "C" {
   float tensor_item(Tensor tensor);
   Tensor tensor_nll_loss(Tensor tensor, Tensor target);
   Tensor relu(Tensor tensor);
+  Tensor dropout(Tensor tensor, float droprate, int is_training);
 #ifdef __cplusplus
 }
 #endif

@@ -32,7 +32,7 @@ void params(TModel model, int size, Tensor *tensor) {
     }
 }
 
-SGD optimizer(Tensor *tensor, float lr, int size) {
+SGD optimizer_sgd(Tensor *tensor, float lr, int size) {
   std::vector<torch::Tensor> tensors;
   for (int i=0; i < size; i++) {
     tensors.push_back(*(torch::Tensor*)tensor[i]);
@@ -47,6 +47,11 @@ void optimizer_zero_grad(SGD optimizer) {
 
 void optimizer_step(SGD optimizer) {
   ((torch::optim::SGD*)optimizer)->step();
+}
+
+int istraining(TModel model) {
+  TorchModel* tmodel = (TorchModel*) model;
+  return tmodel->is_training();
 }
 
 Linear Register_module(const char *name, Linear linear, TModel mod) {
@@ -147,6 +152,17 @@ Tensor relu(Tensor tensor) {
     torch::Tensor *ret_tensor = new torch::Tensor();
     *ret_tensor = torch::relu(*atensor);
     return (void*)ret_tensor;
+}
+
+Tensor dropout(Tensor tensor, float droprate, int is_training) {
+  torch::Tensor *atensor = (torch::Tensor*)tensor;
+  torch::Tensor *ret_tensor = new torch::Tensor();
+  bool is_training_bool = false;
+  if (is_training != 0) {
+    is_training_bool = true;
+  }
+  *ret_tensor = torch::dropout(*atensor, droprate, is_training_bool);
+  return ret_tensor;
 }
 
 
