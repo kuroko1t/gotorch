@@ -2,19 +2,32 @@
 package main
 
 import "./common"
+import "fmt"
 
 func main() {
-	//var a C.int = 10
-	//var b C.int = 10
 	model := torch.ModelInit()
-	linear := torch.Torch_nn_Linear(784, 10)
-	fc1 := model.Register_module("fc1", linear)
-	//fc2 := C.Register_module(C.CString("fc2"), unsafe.Pointer(&linear), model)
-	//fc3 := C.Register_module(C.CString("fc3"), unsafe.Pointer(&linear), model)
-	dataset := torch.MnistDataloader("./data", 10)
-	batch := dataset.Data()
-	x_re := batch.Reshape([]int{batch.Size(0), 784})
-	x_re2 := fc1.Forward(x_re)
-	torch.Log_Softmax(x_re2, 1)
+	fc1 := model.Register_module("fc1", torch.Torch_nn_Linear(784, 64))
+	fc2 := model.Register_module("fc2", torch.Torch_nn_Linear(64, 32))
+	fc3 := model.Register_module("fc3", torch.Torch_nn_Linear(32, 10))
 
+	dataset := torch.MnistDataloader("./data", 64)
+	optimizer := torch.Opimizer(model.Parameters(), 0.01)
+	for epoch := 0; epoch < 10; epoch++ {
+		batch_index := 0
+		for dataset.Next() {
+			optimizer.Zero_grad()
+			batch := dataset.Data()
+			x_re  := batch.Reshape([]int{batch.Size(0), 784})
+			x_re2 := torch.Relu(fc1.Forward(x_re))
+			x_re3 := torch.Relu(fc2.Forward(x_re2))
+			prediction := torch.Log_Softmax(fc3.Forward(x_re3), 1)
+			loss := torch.Nll_loss(prediction, dataset.Target())
+			loss.Backward()
+			optimizer.Step()
+			batch_index += 1
+			if (batch_index %100==0) {
+				fmt.Println(loss.Item())
+			}
+		}
+	}
 }

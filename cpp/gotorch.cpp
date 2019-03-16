@@ -18,6 +18,37 @@ TModel modelInit() {
   return (void*)mod;
 }
 
+void params_size(TModel model, int *size) {
+    TorchModel* tmodel = (TorchModel*) model;
+    *size = tmodel->parameters().size();
+}
+
+void params(TModel model, int size, Tensor *tensor) {
+    TorchModel* tmodel = (TorchModel*) model;
+    for (int i = 0; i < size; i++) {
+        torch::Tensor *datatensor = new torch::Tensor();
+        *datatensor = tmodel->parameters()[i];
+        tensor[i] = datatensor;
+    }
+}
+
+SGD optimizer(Tensor *tensor, float lr, int size) {
+  std::vector<torch::Tensor> tensors;
+  for (int i=0; i < size; i++) {
+    tensors.push_back(*(torch::Tensor*)tensor[i]);
+  }
+  torch::optim::SGD *optimizer = new torch::optim::SGD(tensors, lr);
+  return optimizer;
+}
+
+void optimizer_zero_grad(SGD optimizer) {
+  ((torch::optim::SGD*)optimizer)->zero_grad();
+}
+
+void optimizer_step(SGD optimizer) {
+  ((torch::optim::SGD*)optimizer)->step();
+}
+
 Linear Register_module(const char *name, Linear linear, TModel mod) {
   std::string str(name);
   TorchModel *mod_test = (TorchModel*)(mod);
@@ -26,13 +57,12 @@ Linear Register_module(const char *name, Linear linear, TModel mod) {
   return (void*)((mod_test->register_module(str, p1)).get());
 }
 
-Tensor forward(Linear mod, Tensor tensor) {
-  torch::nn::LinearImpl* pmod = (torch::nn::LinearImpl*)mod;
-  std::shared_ptr<torch::nn::LinearImpl> p1(pmod);
+Tensor forward(Linear linear, Tensor tensor) {
+  torch::nn::LinearImpl* plinear = (torch::nn::LinearImpl*)linear;
   torch::Tensor* ptensor = (torch::Tensor*)tensor;
   torch::Tensor *atensor = new torch::Tensor();
   torch::Tensor* go_atensor = (torch::Tensor*)atensor;
-  *go_atensor = p1->forward(*ptensor);
+  *go_atensor = plinear->forward(*ptensor);
   return (void*)go_atensor;
 }
 
@@ -42,41 +72,39 @@ using mnistDataset = torch::data::StatelessDataLoader<
             torch::data::transforms::Stack<torch::data::Example<>>>,
         torch::data::samplers::RandomSampler>;
 
-//MnistDataSet data_loader(const char *path, int batch_size) {
-//  std::string spath(path);
-//  mnistDataset *dataset = torch::data::make_data_loader(
-//      torch::data::datasets::MNIST(spath)
-//      .map(torch::data::transforms::Stack<>()),
-//      batch_size).get();
-//  return (void*)(dataset);
-//}
-
 //using example_data = torch::data::Example<at::Tensor, at::Tensor>;
 
-Tensor data_loader(const char *path, int batch_size,
-                 int *size, Tensor *target) {
+int data_loader_size(const char *path, int batch_size) {
   std::string spath(path);
   auto dataset = torch::data::make_data_loader(
       torch::data::datasets::MNIST(spath)
       .map(torch::data::transforms::Stack<>()),
       batch_size);
-  std::vector<torch::Tensor> data_vec;
-  std::vector<torch::Tensor> target_vec;
+  int size = 0;
   for (auto& x : *dataset) {
-    data_vec.push_back(x.data);
-    target_vec.push_back(x.target);
+      size +=1;
   }
-  *target = &target_vec[0];
-  *size = data_vec.size();
-  return (void*)&data_vec[0];
+  return size;
 }
 
-//Tensor loader_to_tensor(ExampleDataSet dataset) {
-//   example_data* mdataset = (example_data*)dataset;
-//   torch::Tensor *tensor = new torch::Tensor();
-//   *tensor = mdataset->data;
-//   return (void*)(tensor);
-//}
+void data_loader(const char *path, int batch_size,
+                 Tensor *data_vec, Tensor *target_vec) {
+  std::string spath(path);
+  auto dataset = torch::data::make_data_loader(
+      torch::data::datasets::MNIST(spath)
+      .map(torch::data::transforms::Stack<>()),
+      batch_size);
+  int i = 0;
+  for (auto& x : *dataset) {
+      torch::Tensor *datatensor = new torch::Tensor();
+      torch::Tensor *targettensor = new torch::Tensor();
+      *datatensor = x.data;
+      data_vec[i] = datatensor;
+      *targettensor = x.target;
+      target_vec[i] = targettensor;
+      i+=1;
+  }
+}
 
 int tensor_size(Tensor tensor, int dim) {
   torch::Tensor *atensor = (torch::Tensor*)tensor;
@@ -94,6 +122,11 @@ Tensor tensor_reshape(Tensor tensor, int* shape, int size) {
   return (void*)ret_tensor;
 }
 
+void backward(Tensor tensor) {
+  torch::Tensor *atensor = (torch::Tensor*)tensor;
+  atensor->backward();
+}
+
 Tensor log_softmax(Tensor tensor, int dim) {
   torch::Tensor *atensor = (torch::Tensor*)tensor;
   torch::Tensor *ret_tensor = new torch::Tensor();
@@ -108,6 +141,15 @@ Tensor tensor_nll_loss(Tensor tensor, Tensor target) {
   *ret_tensor = torch::nll_loss(*atensor, *atarget);
   return (void*)ret_tensor;
 }
+
+Tensor relu(Tensor tensor) {
+    torch::Tensor *atensor = (torch::Tensor*)tensor;
+    torch::Tensor *ret_tensor = new torch::Tensor();
+    *ret_tensor = torch::relu(*atensor);
+    return (void*)ret_tensor;
+}
+
+
 
 float tensor_item(Tensor tensor) {
   torch::Tensor *atensor = (torch::Tensor*)tensor;

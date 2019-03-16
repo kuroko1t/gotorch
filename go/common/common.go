@@ -12,18 +12,39 @@ import "os"
 
 type ExampleData struct {
 	dataset C.ExampleDataSet
-	data C.Tensor
-	target C.Tensor
+	current int
+	data []C.Tensor
+	target []C.Tensor
 }
 
-//func (mdata MnistData) Loader_to_Tensor() GoTensor {
-// 	gtensor := GoTensor{}
-// 	gtensor.tensor = C.loader_to_tensor(mdata.cmdata)
-// 	return gtensor
-//}
+func (it *ExampleData) Data() GoTensor {
+	//fmt.Println("it.current:",it.current)
+	ret_tensor := GoTensor{}
+	ret_tensor.tensor = it.data[it.current]
+	return ret_tensor
+}
+
+func (it *ExampleData) Target() GoTensor {
+	ret_tensor := GoTensor{}
+	ret_tensor.tensor = it.target[it.current]
+	return ret_tensor
+}
+
+func (it *ExampleData) Next() bool {
+    it.current += 1
+    if it.current >= len(it.data) {
+		it.current = -1
+        return false
+    }
+    return true
+}
 
 type GoTensor struct {
 	tensor C.Tensor
+}
+
+type GoTensors struct {
+	tensors []C.Tensor
 }
 
 func (tensor GoTensor) Size(dim int) int {
@@ -38,6 +59,10 @@ func (tensor GoTensor) Reshape(shapes []int) GoTensor {
 	ret_tensor := GoTensor{}
 	ret_tensor.tensor = C.tensor_reshape(tensor.tensor, &cshapes[0], C.int(len(shapes)))
 	return ret_tensor
+}
+
+func (tensor GoTensor) Backward() {
+	C.backward(tensor.tensor)
 }
 
 func (tensor GoTensor) Item() float32 {
@@ -58,6 +83,10 @@ type GoModel struct {
 	model C.TModel
 }
 
+type SGD struct {
+	param C.SGD
+}
+
 func (gmodel GoModel) Register_module(name string, f GoLinear) GoLinear {
 	ret_linear := GoLinear{}
 	ret_linear.linear = C.Register_module(C.CString(name), f.linear, gmodel.model)
@@ -69,36 +98,56 @@ func ModelInit() GoModel {
 	gmodel := GoModel{model:torhmodel}
 	return gmodel
 }
-func MnistDataloader(path string, batch_size int) ExampleData {
+
+func (model GoModel) Parameters() GoTensors {
+	var size C.int
+	C.params_size(model.model, &size)
+	tensor_slice := make([]C.Tensor, size, size)
+	tensors := GoTensors{}
+	C.params(model.model, size, &(tensor_slice[0]))
+	tensors.tensors = tensor_slice
+	return tensors
+}
+
+func Opimizer(tensors GoTensors, lr float32) SGD {
+	sgd := SGD{}
+	sgd.param = C.optimizer(&tensors.tensors[0], C.float(lr), C.int(len(tensors.tensors)))
+	return sgd
+}
+
+func (sgd SGD) Zero_grad() {
+	C.optimizer_zero_grad(sgd.param)
+}
+
+func (sgd SGD) Step() {
+	C.optimizer_step(sgd.param)
+}
+
+
+
+func MnistDataloader(path string, batch_size int) *ExampleData {
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		log.Fatal(err)
 	}
 	var size C.int
-	datasets := ExampleData{}
-	fmt.Println(datasets.data)
-	datasets.data = C.data_loader(C.CString(path), C.int(batch_size),
-		&size, &(datasets.target))
-	fmt.Println(datasets.data)
+	exdata := ExampleData{current:-1}
+	size = C.data_loader_size(C.CString(path), C.int(batch_size))
 	fmt.Println(size)
-	//datasets.dataset = loader
-	//datasets := make([]ExampleDatap, size)
-	//var go_array []C.ExampleDataSet
-	//slice := (*reflect.SliceHeader)(unsafe.Pointer(&go_array))
-	//slice.Cap = int(size)
-	//slice.Len = int(size)
-	//slice.Data = uintptr(unsafe.Pointer(loader))
-	//for i := range datasets {
-	// 	datasets[i].dataset = go_array[i]
-	//}
-	return datasets;
+	data_slice := make([]C.Tensor, size, size)
+	target_slice := make([]C.Tensor, size, size)
+	fmt.Println(len(data_slice))
+	C.data_loader(C.CString(path), C.int(batch_size),	&(data_slice[0]), &(target_slice[0]))
+	exdata.data = data_slice
+	exdata.target = target_slice
+	return &exdata;
 }
 
-func (data ExampleData) Data() GoTensor {
-	ret_gtensor := GoTensor{}
-	ret_gtensor.tensor = data.data
-	//ret_gtensor.tensor = C.loader_to_tensor(data.dataset)
-	return ret_gtensor
-}
+//func (data ExampleData) Data() GoTensor {
+// 	ret_gtensor := GoTensor{}
+// 	ret_gtensor.tensor = data.data[0]
+// 	//ret_gtensor.tensor = C.loader_to_tensor(data.dataset)
+// 	return ret_gtensor
+//}
 
 func Torch_nn_Linear(a, b int) GoLinear {
 	golinear := GoLinear{}
@@ -112,9 +161,15 @@ func Log_Softmax(tensor GoTensor, dim int) GoTensor {
 	return ret_gtensor
 }
 
-func Nll_Loss(tensor, target GoTensor) GoTensor{
+func Nll_loss(tensor, target GoTensor) GoTensor{
 	ret_gtensor := GoTensor{}
 	ret_gtensor.tensor = C.tensor_nll_loss(tensor.tensor, target.tensor)
+	return ret_gtensor
+}
+
+func Relu(tensor GoTensor) GoTensor{
+	ret_gtensor := GoTensor{}
+	ret_gtensor.tensor = C.relu(tensor.tensor)
 	return ret_gtensor
 }
 
