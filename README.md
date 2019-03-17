@@ -2,6 +2,12 @@
 
 gobinding for pytorch.
 
+# Install
+
+```
+go get github.com/kuroko1t/gotorch
+```
+
 # setting
 
 ```
