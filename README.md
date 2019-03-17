@@ -5,15 +5,18 @@ gobinding for pytorch.
 # setting
 
 ```
-$cd gotorch
-$export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:`pwd`/build:`pwd`/libtorch/lib
-$sh make.sh
-
+$ cd gotorch
+$ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:`pwd`/build:`pwd`/libtorch/lib
+$ sh make.sh
 ```
 
 ## mnist sample
 
-go run example/gomnist.go
+```
+$ go run example/gomnist.go
+```
+
+code sample
 
 ```golang
 
