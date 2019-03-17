@@ -2,13 +2,13 @@
 
 gobinding for pytorch.
 
-# Install
+## Install
 
 ```
 go get github.com/kuroko1t/gotorch
 ```
 
-# setting
+## setting
 
 ```
 $ cd gotorch
@@ -70,3 +70,7 @@ func main() {
 
 
 ```
+
+
+## License
+MIT
