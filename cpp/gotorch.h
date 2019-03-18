@@ -61,6 +61,8 @@ extern "C" {
   Tensor tensor_nll_loss(Tensor tensor, Tensor target);
   Tensor relu(Tensor tensor);
   Tensor dropout(Tensor tensor, float droprate, int is_training);
+
+  void save(TModel model, const char *path);
 #ifdef __cplusplus
 }
 #endif

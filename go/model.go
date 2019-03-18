@@ -61,3 +61,7 @@ func (model GoModel) Is_training() bool {
 		return false
 	}
 }
+
+func (model GoModel) Save(path string) {
+	C.save(model.model, C.CString(path))
+}

@@ -14,7 +14,6 @@ func main() {
 	for epoch := 0; epoch < 10; epoch++ {
 		batch_index := 0
 		for dataset.Next() {
-
 			// Reset gradients.
 			optimizer.Zero_grad()
 
@@ -35,6 +34,7 @@ func main() {
 			batch_index += 1
 			if batch_index%100 == 0 {
 				fmt.Println("epoch:", epoch, "batch:", batch_index, "loss:", loss.Item())
+				model.Save("net.pt")
 			}
 		}
 	}

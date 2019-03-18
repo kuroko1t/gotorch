@@ -192,3 +192,11 @@ float tensor_item(Tensor tensor) {
   torch::Tensor *atensor = (torch::Tensor*)tensor;
   return atensor->item<float>();
 }
+
+void save(TModel model, const char *path) {
+  std::string spath(path);
+  TorchModel* tmodel = (TorchModel*) model;
+  std::shared_ptr<torch::nn::Module> t1model =
+    std::make_shared<torch::nn::Module>(*tmodel);
+  torch::save(t1model, spath);
+}
