@@ -26,7 +26,10 @@ SOFTWARE.
 extern "C" {
   #endif
 
+  /* Operation Impl */
   typedef void* Linear;
+  typedef void* Conv2dImpl;
+
   typedef void* ATensor;
   typedef void* Module;
   typedef void* MnistDataSet;
@@ -39,13 +42,15 @@ extern "C" {
   void params(TModel model, int size, Tensor *tensor);
   int istraining(TModel model);
 
-
   SGD optimizer_sgd(Tensor *tensor, float lr, int size);
   void optimizer_zero_grad(SGD optimizer);
   void optimizer_step(SGD optimizer);
 
   Linear torch_nn_Linear(int a, int b);
-  Linear Register_module(const char *name, Linear liner, TModel model);
+  Linear Register_module_linear(const char *name, Linear linear, TModel mod);
+
+  Conv2dImpl conv2doptions(int in_channels, int out_channels, int kernel_size);
+
   Tensor forward(Linear mod, Tensor tensor);
   int data_loader_size(const char *path, int batch_size);
   void data_loader(const char *path, int batch_size,

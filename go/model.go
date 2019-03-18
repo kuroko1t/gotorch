@@ -28,13 +28,21 @@ package torch
 // #include "gotorch.h"
 import "C"
 
+type GoLinear struct {
+	linear C.Linear
+}
+
+type Conv2d struct {
+	conv C.Conv2dImpl
+}
+
 type GoModel struct {
 	model C.TModel
 }
 
 func (model GoModel) Register_module(name string, f GoLinear) GoLinear {
 	ret_linear := GoLinear{}
-	ret_linear.linear = C.Register_module(C.CString(name), f.linear, model.model)
+	ret_linear.linear = C.Register_module_linear(C.CString(name), f.linear, model.model)
 	return ret_linear
 }
 
@@ -42,6 +50,12 @@ func ModelInit() GoModel {
 	torhmodel := C.modelInit()
 	gmodel := GoModel{model: torhmodel}
 	return gmodel
+}
+
+func Torch_nn_Linear(a, b int) GoLinear {
+	golinear := GoLinear{}
+	golinear.linear = C.torch_nn_Linear(C.int(a), C.int(b))
+	return golinear
 }
 
 func (model GoModel) Parameters() GoTensors {

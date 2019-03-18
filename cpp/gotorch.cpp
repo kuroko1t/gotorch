@@ -75,13 +75,27 @@ int istraining(TModel model) {
   return tmodel->is_training();
 }
 
-Linear Register_module(const char *name, Linear linear, TModel mod) {
+Linear Register_module_linear(const char *name, Linear linear, TModel mod) {
   std::string str(name);
-  TorchModel *mod_test = (TorchModel*)(mod);
+  TorchModel *mod_test = (TorchModel*)mod;
   torch::nn::LinearImpl *plinear = (torch::nn::LinearImpl*)linear;
   std::shared_ptr<torch::nn::LinearImpl> p1(plinear);
   return (void*)((mod_test->register_module(str, p1)).get());
 }
+
+Conv2dImpl conv2doptions(int in_channels, int out_channels, int kernel_size) {
+  torch::nn::Conv2dImpl *conv2d = new torch::nn::Conv2dImpl(in_channels, out_channels, kernel_size);
+  return conv2d;
+}
+
+void* conv2d(TModel mod, Conv2dImpl conv2d) {
+  torch::nn::Conv2dImpl *conv2d_re = (torch::nn::Conv2dImpl*)conv2d;
+  TorchModel *mod_re = (TorchModel*)mod;
+  torch::nn::Conv2d *conv1 = new torch::nn::Conv2d(*conv2d_re);
+  return conv1;
+}
+
+
 
 Tensor forward(Linear linear, Tensor tensor) {
   torch::nn::LinearImpl* plinear = (torch::nn::LinearImpl*)linear;

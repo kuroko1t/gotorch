@@ -28,21 +28,10 @@ package torch
 // #include "gotorch.h"
 import "C"
 
-type GoLinear struct {
-	linear C.Linear
-}
-
-
 func (linear GoLinear) Forward(tensor GoTensor) GoTensor {
 	ret_gtensor := GoTensor{}
 	ret_gtensor.tensor = C.forward(linear.linear, tensor.tensor)
 	return ret_gtensor
-}
-
-func Torch_nn_Linear(a, b int) GoLinear {
-	golinear := GoLinear{}
-	golinear.linear = C.torch_nn_Linear(C.int(a), C.int(b))
-	return golinear
 }
 
 func Log_Softmax(tensor GoTensor, dim int) GoTensor {
