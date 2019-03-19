@@ -28,21 +28,16 @@ package torch
 // #include "gotorch.h"
 import "C"
 
-type GoLinear struct {
-	linear C.Linear
-}
-
-
-func (linear GoLinear) Forward(tensor GoTensor) GoTensor {
+func (impl Impl) Forward(tensor GoTensor) GoTensor {
 	ret_gtensor := GoTensor{}
-	ret_gtensor.tensor = C.forward(linear.linear, tensor.tensor)
+	if impl.linear != nil {
+		ret_gtensor.tensor = C.forward_linear(impl.linear, tensor.tensor)
+	} else if impl.conv2d != nil {
+		ret_gtensor.tensor = C.forward_conv2d(impl.conv2d, tensor.tensor)
+	} else if impl.featureDropout != nil {
+		ret_gtensor.tensor = C.forward_featureDropout(impl.featureDropout, tensor.tensor)
+	}
 	return ret_gtensor
-}
-
-func Torch_nn_Linear(a, b int) GoLinear {
-	golinear := GoLinear{}
-	golinear.linear = C.torch_nn_Linear(C.int(a), C.int(b))
-	return golinear
 }
 
 func Log_Softmax(tensor GoTensor, dim int) GoTensor {
@@ -70,5 +65,11 @@ func Dropout(tensor GoTensor, lr float32, is_training bool) GoTensor {
 		is_training_int = 1
 	}
 	ret_gtensor.tensor = C.dropout(tensor.tensor, C.float(lr), C.int(is_training_int))
+	return ret_gtensor
+}
+
+func Max_pool2d(tensor GoTensor, kernel_size int) GoTensor {
+	ret_gtensor := GoTensor{}
+	ret_gtensor.tensor = C.max_pool2d(tensor.tensor, C.int(kernel_size))
 	return ret_gtensor
 }

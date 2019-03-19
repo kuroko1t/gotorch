@@ -29,7 +29,7 @@ struct TorchModel : public torch::nn::Module {
   using torch::nn::Module::register_module;
 };
 
-Linear torch_nn_Linear(int a, int b) {
+LinearImpl linear(int a, int b) {
   torch::nn::LinearImpl *linear= new torch::nn::LinearImpl(a, b);
   return linear;
 }
@@ -75,20 +75,67 @@ int istraining(TModel model) {
   return tmodel->is_training();
 }
 
-Linear Register_module(const char *name, Linear linear, TModel mod) {
+LinearImpl register_module_linear(const char *name, LinearImpl linear, TModel mod) {
   std::string str(name);
-  TorchModel *mod_test = (TorchModel*)(mod);
+  TorchModel *mod_test = (TorchModel*)mod;
   torch::nn::LinearImpl *plinear = (torch::nn::LinearImpl*)linear;
   std::shared_ptr<torch::nn::LinearImpl> p1(plinear);
   return (void*)((mod_test->register_module(str, p1)).get());
 }
 
-Tensor forward(Linear linear, Tensor tensor) {
+Conv2dImpl register_module_conv2d(const char *name, Conv2dImpl conv2d, TModel mod) {
+  std::string str(name);
+  TorchModel *mod_re = (TorchModel*)mod;
+  torch::nn::Conv2dImpl *conv2d_re = (torch::nn::Conv2dImpl*)conv2d;
+  std::shared_ptr<torch::nn::Conv2dImpl> conv2d_re_sh(conv2d_re);
+  return ((mod_re->register_module(str, conv2d_re_sh)).get());
+}
+
+FeatureDropoutImpl register_module_featureDropout(const char *name,
+                                                  FeatureDropoutImpl featuredrop, TModel mod) {
+  std::string str(name);
+  TorchModel *mod_re = (TorchModel*)mod;
+  torch::nn::FeatureDropoutImpl *featuredrop_re = (torch::nn::FeatureDropoutImpl*)featuredrop;
+  std::shared_ptr<torch::nn::FeatureDropoutImpl> featuredrop_re_sh(featuredrop_re);
+  return ((mod_re->register_module(str, featuredrop_re_sh)).get());
+}
+
+
+Conv2dImpl conv2d(int in_channels, int out_channels, int kernel_size) {
+  torch::nn::Conv2dImpl *conv2d = new torch::nn::Conv2dImpl(in_channels, out_channels, kernel_size);
+  return conv2d;
+}
+
+FeatureDropoutImpl FeatureDropout() {
+  torch::nn::FeatureDropoutImpl *conv_drop =
+    new torch::nn::FeatureDropoutImpl();
+  return conv_drop;
+}
+
+Tensor forward_linear(LinearImpl linear, Tensor tensor) {
   torch::nn::LinearImpl* plinear = (torch::nn::LinearImpl*)linear;
   torch::Tensor* ptensor = (torch::Tensor*)tensor;
   torch::Tensor *atensor = new torch::Tensor();
   torch::Tensor* go_atensor = (torch::Tensor*)atensor;
   *go_atensor = plinear->forward(*ptensor);
+  return (void*)go_atensor;
+}
+
+Tensor forward_conv2d(Conv2dImpl conv2d, Tensor tensor) {
+  torch::nn::Conv2dImpl* conv2d_re = (torch::nn::Conv2dImpl*)conv2d;
+  torch::Tensor* ptensor = (torch::Tensor*)tensor;
+  torch::Tensor *atensor = new torch::Tensor();
+  torch::Tensor* go_atensor = (torch::Tensor*)atensor;
+  *go_atensor = conv2d_re->forward(*ptensor);
+  return (void*)go_atensor;
+}
+
+Tensor forward_featureDropout(FeatureDropoutImpl featuredrop, Tensor tensor) {
+  torch::nn::FeatureDropoutImpl* featuredrop_re = (torch::nn::FeatureDropoutImpl*)featuredrop;
+  torch::Tensor* ptensor = (torch::Tensor*)tensor;
+  torch::Tensor *atensor = new torch::Tensor();
+  torch::Tensor* go_atensor = (torch::Tensor*)atensor;
+  *go_atensor = featuredrop_re->forward(*ptensor);
   return (void*)go_atensor;
 }
 
@@ -136,6 +183,18 @@ int tensor_size(Tensor tensor, int dim) {
   torch::Tensor *atensor = (torch::Tensor*)tensor;
   return atensor->size(dim);
 }
+
+Tensor tensor_view(Tensor tensor, int* shape, int size) {
+  torch::Tensor *atensor = (torch::Tensor*)tensor;
+  std::vector<long> x;
+  for (int i=0; i < size; i++) {
+    x.push_back((long)shape[i]);
+  }
+  torch::Tensor *ret_tensor = new torch::Tensor();
+  *ret_tensor = atensor->view(x);
+  return ret_tensor;
+}
+
 
 Tensor tensor_reshape(Tensor tensor, int* shape, int size) {
   torch::Tensor *atensor = (torch::Tensor*)tensor;
@@ -186,7 +245,12 @@ Tensor dropout(Tensor tensor, float droprate, int is_training) {
   return ret_tensor;
 }
 
-
+Tensor max_pool2d(Tensor tensor, int kernel_size) {
+  torch::Tensor *atensor = (torch::Tensor*)tensor;
+  torch::Tensor *ret_tensor = new torch::Tensor();
+  *ret_tensor = torch::max_pool2d(*atensor, kernel_size);
+  return (void*)ret_tensor;
+}
 
 float tensor_item(Tensor tensor) {
   torch::Tensor *atensor = (torch::Tensor*)tensor;

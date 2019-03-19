@@ -57,3 +57,13 @@ func (tensor GoTensor) Backward() {
 func (tensor GoTensor) Item() float32 {
 	return float32(C.tensor_item(tensor.tensor))
 }
+
+func (tensor GoTensor) View(shapes []int) GoTensor {
+	cshapes := make([]C.int, len(shapes))
+	for i, shape := range shapes {
+		cshapes[i] = C.int(shape)
+	}
+	ret_tensor := GoTensor{}
+	ret_tensor.tensor = C.tensor_view(tensor.tensor, &cshapes[0], C.int(len(shapes)))
+	return ret_tensor
+}

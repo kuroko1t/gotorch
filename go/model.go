@@ -28,20 +28,51 @@ package torch
 // #include "gotorch.h"
 import "C"
 
+type Impl struct {
+	conv2d         C.Conv2dImpl
+	linear         C.LinearImpl
+	featureDropout C.FeatureDropoutImpl
+}
+
 type GoModel struct {
 	model C.TModel
 }
 
-func (model GoModel) Register_module(name string, f GoLinear) GoLinear {
-	ret_linear := GoLinear{}
-	ret_linear.linear = C.Register_module(C.CString(name), f.linear, model.model)
-	return ret_linear
+func (model GoModel) Register_module(name string, f Impl) Impl {
+	ret_impl := Impl{}
+	if f.linear != nil {
+		ret_impl.linear = C.register_module_linear(C.CString(name), f.linear, model.model)
+	} else if f.conv2d != nil {
+		ret_impl.conv2d = C.register_module_conv2d(C.CString(name), f.conv2d, model.model)
+	} else if f.featureDropout != nil {
+		ret_impl.featureDropout =
+			C.register_module_featureDropout(C.CString(name), f.featureDropout, model.model)
+	}
+	return ret_impl
 }
 
 func ModelInit() GoModel {
 	torhmodel := C.modelInit()
 	gmodel := GoModel{model: torhmodel}
 	return gmodel
+}
+
+func Linear(a, b int) Impl {
+	impl := Impl{}
+	impl.linear = C.linear(C.int(a), C.int(b))
+	return impl
+}
+
+func Conv2d(in_channels, out_channels, kernel_size int) Impl {
+	impl := Impl{}
+	impl.conv2d = C.conv2d(C.int(in_channels), C.int(out_channels), C.int(kernel_size))
+	return impl
+}
+
+func FeatureDropout() Impl {
+	impl := Impl{}
+	impl.featureDropout = C.FeatureDropout()
+	return impl
 }
 
 func (model GoModel) Parameters() GoTensors {
