@@ -33,9 +33,9 @@ import "fmt"
 
 func main() {
 	model := torch.ModelInit()
-	fc1 := model.Register_module("fc1", torch.Torch_nn_Linear(784, 64))
-	fc2 := model.Register_module("fc2", torch.Torch_nn_Linear(64, 32))
-	fc3 := model.Register_module("fc3", torch.Torch_nn_Linear(32, 10))
+	fc1 := model.Register_module("fc1", torch.Linear(784, 64))
+	fc2 := model.Register_module("fc2", torch.Linear(64, 32))
+	fc3 := model.Register_module("fc3", torch.Linear(32, 10))
 
 	dataset := torch.MnistDataloader("./data", 64)
 	optimizer := torch.Opimizer(model.Parameters(), 0.01)
@@ -62,7 +62,7 @@ func main() {
 			batch_index += 1
 			if batch_index%100 == 0 {
 				fmt.Println("epoch:", epoch, "batch:", batch_index, "loss:", loss.Item())
-                model.Save("net.pt")
+				model.Save("net.pt")
 			}
 		}
 	}
