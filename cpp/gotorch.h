@@ -27,8 +27,9 @@ extern "C" {
   #endif
 
   /* Operation Impl */
-  typedef void* Linear;
+  typedef void* LinearImpl;
   typedef void* Conv2dImpl;
+  typedef void* FeatureDropoutImpl;
 
   typedef void* ATensor;
   typedef void* Module;
@@ -37,6 +38,7 @@ extern "C" {
   typedef void* Tensor;
   typedef void* SGD;
   typedef void* ExampleDataSet;
+
   TModel modelInit();
   void params_size(TModel model, int *size);
   void params(TModel model, int size, Tensor *tensor);
@@ -46,12 +48,20 @@ extern "C" {
   void optimizer_zero_grad(SGD optimizer);
   void optimizer_step(SGD optimizer);
 
-  Linear torch_nn_Linear(int a, int b);
-  Linear Register_module_linear(const char *name, Linear linear, TModel mod);
+  LinearImpl linear(int a, int b);
+  LinearImpl register_module_linear(const char *name, LinearImpl linear, TModel mod);
 
-  Conv2dImpl conv2doptions(int in_channels, int out_channels, int kernel_size);
+  Conv2dImpl conv2d(int in_channels, int out_channels, int kernel_size);
+  Conv2dImpl register_module_conv2d(const char *name, Conv2dImpl conv2d, TModel mod);
 
-  Tensor forward(Linear mod, Tensor tensor);
+  FeatureDropoutImpl FeatureDropout();
+  FeatureDropoutImpl register_module_featureDropout(const char *name,
+                                                    FeatureDropoutImpl featuredrop, TModel mod);
+
+  Tensor forward_linear(LinearImpl mod, Tensor tensor);
+  Tensor forward_conv2d(Conv2dImpl conv2d, Tensor tensor);
+  Tensor forward_featureDropout(FeatureDropoutImpl featuredrop, Tensor tensor);
+
   int data_loader_size(const char *path, int batch_size);
   void data_loader(const char *path, int batch_size,
                  Tensor *data_vec, Tensor *target_vec);
@@ -59,13 +69,17 @@ extern "C" {
 
   int tensor_size(Tensor tensor, int dim);
   Tensor tensor_reshape(Tensor tensor, int* shape, int size);
+  Tensor tensor_view(Tensor tensor, int* shape, int size);
+
   void backward(Tensor tensor);
 
-  Tensor log_softmax(Tensor tensor, int dim);
   float tensor_item(Tensor tensor);
+
+  Tensor log_softmax(Tensor tensor, int dim);
   Tensor tensor_nll_loss(Tensor tensor, Tensor target);
   Tensor relu(Tensor tensor);
   Tensor dropout(Tensor tensor, float droprate, int is_training);
+  Tensor max_pool2d(Tensor tensor, int kernel_size);
 
   void save(TModel model, const char *path);
 #ifdef __cplusplus
