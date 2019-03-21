@@ -27,6 +27,7 @@ package torch
 // #cgo LDFLAGS: -L${SRCDIR}/../libtorch/lib -L${SRCDIR}/../build -lgotorch -lpthread -lcaffe2 -lc10 -ltorch -lstdc++
 // #include "gotorch.h"
 import "C"
+import "github.com/kuroko1t/gotorch/go/wrap"
 
 type GoTensor struct {
 	tensor C.Tensor
@@ -37,7 +38,7 @@ type GoTensors struct {
 }
 
 func (tensor GoTensor) Size(dim int) int {
-	return int(C.tensor_size(tensor.tensor, C.int(dim)))
+	return int(wrap.Tensor_size(tensor.tensor, C.int(dim)))
 }
 
 func (tensor GoTensor) Reshape(shapes []int) GoTensor {
@@ -46,7 +47,7 @@ func (tensor GoTensor) Reshape(shapes []int) GoTensor {
 		cshapes[i] = C.int(shape)
 	}
 	ret_tensor := GoTensor{}
-	ret_tensor.tensor = C.tensor_reshape(tensor.tensor, &cshapes[0], C.int(len(shapes)))
+	ret_tensor.tensor = wrap.Tensor_reshape(tensor.tensor, &cshapes[0], C.int(len(shapes)))
 	return ret_tensor
 }
 

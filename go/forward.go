@@ -27,34 +27,35 @@ package torch
 // #cgo LDFLAGS: -L${SRCDIR}/../libtorch/lib -L${SRCDIR}/../build -lgotorch -lpthread -lcaffe2 -lc10 -ltorch -lstdc++
 // #include "gotorch.h"
 import "C"
+import "github.com/kuroko1t/gotorch/go/wrap"
 
 func (impl Impl) Forward(tensor GoTensor) GoTensor {
 	ret_gtensor := GoTensor{}
 	if impl.linear != nil {
-		ret_gtensor.tensor = C.forward_linear(impl.linear, tensor.tensor)
+		ret_gtensor.tensor = wrap.Forward_linear(impl.linear, tensor.tensor)
 	} else if impl.conv2d != nil {
-		ret_gtensor.tensor = C.forward_conv2d(impl.conv2d, tensor.tensor)
+		ret_gtensor.tensor = wrap.Forward_conv2d(impl.conv2d, tensor.tensor)
 	} else if impl.featureDropout != nil {
-		ret_gtensor.tensor = C.forward_featureDropout(impl.featureDropout, tensor.tensor)
+		ret_gtensor.tensor = wrap.Forward_featureDropout(impl.featureDropout, tensor.tensor)
 	}
 	return ret_gtensor
 }
 
 func Log_Softmax(tensor GoTensor, dim int) GoTensor {
 	ret_gtensor := GoTensor{}
-	ret_gtensor.tensor = C.log_softmax(tensor.tensor, C.int(dim))
+	ret_gtensor.tensor = wrap.Log_softmax(tensor.tensor, C.int(dim))
 	return ret_gtensor
 }
 
 func Nll_loss(tensor, target GoTensor) GoTensor {
 	ret_gtensor := GoTensor{}
-	ret_gtensor.tensor = C.tensor_nll_loss(tensor.tensor, target.tensor)
+	ret_gtensor.tensor = wrap.Tensor_nll_loss(tensor.tensor, target.tensor)
 	return ret_gtensor
 }
 
 func Relu(tensor GoTensor) GoTensor {
 	ret_gtensor := GoTensor{}
-	ret_gtensor.tensor = C.relu(tensor.tensor)
+	ret_gtensor.tensor = wrap.Relu(tensor.tensor)
 	return ret_gtensor
 }
 
@@ -64,12 +65,12 @@ func Dropout(tensor GoTensor, lr float32, is_training bool) GoTensor {
 	if is_training {
 		is_training_int = 1
 	}
-	ret_gtensor.tensor = C.dropout(tensor.tensor, C.float(lr), C.int(is_training_int))
+	ret_gtensor.tensor = wrap.Dropout(tensor.tensor, C.float(lr), C.int(is_training_int))
 	return ret_gtensor
 }
 
 func Max_pool2d(tensor GoTensor, kernel_size int) GoTensor {
 	ret_gtensor := GoTensor{}
-	ret_gtensor.tensor = C.max_pool2d(tensor.tensor, C.int(kernel_size))
+	ret_gtensor.tensor = wrap.Max_pool2d(tensor.tensor, C.int(kernel_size))
 	return ret_gtensor
 }

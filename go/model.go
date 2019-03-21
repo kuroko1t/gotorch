@@ -27,6 +27,7 @@ package torch
 // #cgo LDFLAGS: -L${SRCDIR}/../libtorch/lib -L${SRCDIR}/../build -lgotorch -lpthread -lcaffe2 -lc10 -ltorch -lstdc++
 // #include "gotorch.h"
 import "C"
+import "github.com/kuroko1t/gotorch/go/wrap"
 
 type Impl struct {
 	conv2d         C.Conv2dImpl
@@ -41,52 +42,52 @@ type GoModel struct {
 func (model GoModel) Register_module(name string, f Impl) Impl {
 	ret_impl := Impl{}
 	if f.linear != nil {
-		ret_impl.linear = C.register_module_linear(C.CString(name), f.linear, model.model)
+		ret_impl.linear = wrap.Register_module_linear(C.CString(name), f.linear, model.model)
 	} else if f.conv2d != nil {
-		ret_impl.conv2d = C.register_module_conv2d(C.CString(name), f.conv2d, model.model)
+		ret_impl.conv2d = wrap.Register_module_conv2d(C.CString(name), f.conv2d, model.model)
 	} else if f.featureDropout != nil {
 		ret_impl.featureDropout =
-			C.register_module_featureDropout(C.CString(name), f.featureDropout, model.model)
+			wrap.Register_module_featureDropout(C.CString(name), f.featureDropout, model.model)
 	}
 	return ret_impl
 }
 
 func ModelInit() GoModel {
-	torhmodel := C.modelInit()
+	torhmodel := wrap.ModelInit()
 	gmodel := GoModel{model: torhmodel}
 	return gmodel
 }
 
 func Linear(a, b int) Impl {
 	impl := Impl{}
-	impl.linear = C.linear(C.int(a), C.int(b))
+	impl.linear = wrap.Linear(C.int(a), C.int(b))
 	return impl
 }
 
 func Conv2d(in_channels, out_channels, kernel_size int) Impl {
 	impl := Impl{}
-	impl.conv2d = C.conv2d(C.int(in_channels), C.int(out_channels), C.int(kernel_size))
+	impl.conv2d = wrap.Conv2d(C.int(in_channels), C.int(out_channels), C.int(kernel_size))
 	return impl
 }
 
 func FeatureDropout() Impl {
 	impl := Impl{}
-	impl.featureDropout = C.FeatureDropout()
+	impl.featureDropout = wrap.FeatureDropout()
 	return impl
 }
 
 func (model GoModel) Parameters() GoTensors {
 	var size C.int
-	C.params_size(model.model, &size)
+	wrap.Params_size(model.model, &size)
 	tensor_slice := make([]C.Tensor, size, size)
 	tensors := GoTensors{}
-	C.params(model.model, size, &(tensor_slice[0]))
+	wrap.params(model.model, size, &(tensor_slice[0]))
 	tensors.tensors = tensor_slice
 	return tensors
 }
 
 func (model GoModel) Is_training() bool {
-	if int(C.istraining(model.model)) != 0 {
+	if int(wrap.Istraining(model.model)) != 0 {
 		return true
 	} else {
 		return false
@@ -94,5 +95,5 @@ func (model GoModel) Is_training() bool {
 }
 
 func (model GoModel) Save(path string) {
-	C.save(model.model, C.CString(path))
+	wrap.Save(model.model, C.CString(path))
 }

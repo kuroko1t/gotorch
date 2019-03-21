@@ -24,10 +24,9 @@ SOFTWARE.
 
 package torch
 
-// #cgo CFLAGS: -I${SRCDIR}/../libtorch/include/ -I${SRCDIR}/../libtorch/include/torch/csrc/api/include/ -I${SRCDIR}/../cpp
-// #cgo LDFLAGS: -L${SRCDIR}/../libtorch/lib -L${SRCDIR}/../build -lgotorch -lpthread -lcaffe2 -lc10 -ltorch -lstdc++
 // #include "gotorch.h"
 import "C"
+
 import (
 	"fmt"
 	"io"
@@ -38,6 +37,9 @@ import (
 )
 
 import "github.com/kuroko1t/gotorch/go/common"
+import "github.com/kuroko1t/gotorch/go/wrap"
+
+//type wrap_int wrap._Ctype_int
 
 type ExampleData struct {
 	dataset C.ExampleDataSet
@@ -75,10 +77,10 @@ func MnistDataloader(path string, batch_size int) *ExampleData {
 	}
 	var size C.int
 	exdata := ExampleData{current: -1}
-	size = C.data_loader_size(C.CString(path), C.int(batch_size))
+	size = C.int(wrap.Data_loader_size(C.CString(path), C.int(batch_size)))
 	data_slice := make([]C.Tensor, size, size)
 	target_slice := make([]C.Tensor, size, size)
-	C.data_loader(C.CString(path), C.int(batch_size), &(data_slice[0]), &(target_slice[0]))
+	wrap.Data_loader(C.CString(path), C.int(batch_size), &(data_slice[0]), &(target_slice[0]))
 	exdata.data = data_slice
 	exdata.target = target_slice
 	return &exdata
