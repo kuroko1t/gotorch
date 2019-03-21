@@ -82,6 +82,8 @@ extern "C" {
   Tensor max_pool2d(Tensor tensor, int kernel_size);
 
   void save(TModel model, const char *path);
+
+  int cuda_is_available();
 #ifdef __cplusplus
 }
 #endif

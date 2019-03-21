@@ -264,3 +264,7 @@ void save(TModel model, const char *path) {
     std::make_shared<torch::nn::Module>(*tmodel);
   torch::save(t1model, spath);
 }
+
+int cuda_is_available() {
+  return torch::cuda::is_available();
+}
