@@ -23,8 +23,6 @@ SOFTWARE.
 */
 package torch
 
-// #cgo CFLAGS: -I${SRCDIR}/../libtorch/include/ -I${SRCDIR}/../libtorch/include/torch/csrc/api/include/ -I${SRCDIR}/../cpp
-// #cgo LDFLAGS: -L${SRCDIR}/../libtorch/lib -L${SRCDIR}/../build -lgotorch -lpthread -lcaffe2 -lc10 -ltorch -lstdc++
 // #include "gotorch.h"
 import "C"
 import "log"
@@ -94,10 +92,6 @@ func tensor_device_check(tensor GoTensor) {
 	if C.tensor_is_cuda(tensor.tensor) != 0 {
 		if tensor.device.cuda == nil {
 			log.Fatal("Tensor is gpu, but model is cpu")
-		}
-	} else {
-		if tensor.device.cpu == nil {
-			log.Fatal("Tensor is cpu, but model is gpu")
 		}
 	}
 }
