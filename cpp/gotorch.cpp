@@ -303,15 +303,11 @@ CPU cpu_device() {
 void model_to_cuda(TModel model, CUDA device) {
   TorchModel* tmodel = (TorchModel*) model;
   torch::Device* device_re = (torch::Device*)device;
-  //std::shared_ptr<torch::nn::Module> t1model =
-  //  std::make_shared<torch::nn::Module>(*tmodel);
   tmodel->to(*device_re);
 }
 
 void model_to_cpu(TModel model, CPU device) {
   TorchModel* tmodel = (TorchModel*) model;
   torch::Device* device_re = (torch::Device*)device;
-  //std::shared_ptr<torch::nn::Module> t1model =
-  //  std::make_shared<torch::nn::Module>(*tmodel);
   tmodel->to(*device_re);
 }
