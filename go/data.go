@@ -37,7 +37,6 @@ import (
 )
 
 import "github.com/kuroko1t/gotorch/go/common"
-//import "github.com/kuroko1t/gotorch/go/wrap"
 
 type ExampleData struct {
 	dataset C.ExampleDataSet

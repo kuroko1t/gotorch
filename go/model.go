@@ -41,7 +41,7 @@ type GoModel struct {
 
 type GoDevice struct {
 	cuda C.CUDA
-	cpu C.CPU
+	cpu  C.CPU
 }
 
 func (model GoModel) Register_module(name string, f Impl) Impl {
