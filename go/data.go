@@ -37,9 +37,7 @@ import (
 )
 
 import "github.com/kuroko1t/gotorch/go/common"
-import "github.com/kuroko1t/gotorch/go/wrap"
-
-//type wrap_int wrap._Ctype_int
+//import "github.com/kuroko1t/gotorch/go/wrap"
 
 type ExampleData struct {
 	dataset C.ExampleDataSet
@@ -77,10 +75,10 @@ func MnistDataloader(path string, batch_size int) *ExampleData {
 	}
 	var size C.int
 	exdata := ExampleData{current: -1}
-	size = C.int(wrap.Data_loader_size(C.CString(path), C.int(batch_size)))
+	size = C.data_loader_size(C.CString(path), C.int(batch_size))
 	data_slice := make([]C.Tensor, size, size)
 	target_slice := make([]C.Tensor, size, size)
-	wrap.Data_loader(C.CString(path), C.int(batch_size), &(data_slice[0]), &(target_slice[0]))
+	C.data_loader(C.CString(path), C.int(batch_size), &(data_slice[0]), &(target_slice[0]))
 	exdata.data = data_slice
 	exdata.target = target_slice
 	return &exdata

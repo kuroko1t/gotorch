@@ -27,7 +27,7 @@ package torch
 // #cgo LDFLAGS: -L${SRCDIR}/../libtorch/lib -L${SRCDIR}/../build -lgotorch -lpthread -lcaffe2 -lc10 -ltorch -lstdc++
 // #include "gotorch.h"
 import "C"
-import "github.com/kuroko1t/gotorch/go/wrap"
+import "log"
 
 type Impl struct {
 	conv2d         C.Conv2dImpl
@@ -39,55 +39,60 @@ type GoModel struct {
 	model C.TModel
 }
 
+type GoDevice struct {
+	cuda C.CUDA
+	cpu C.CPU
+}
+
 func (model GoModel) Register_module(name string, f Impl) Impl {
 	ret_impl := Impl{}
 	if f.linear != nil {
-		ret_impl.linear = wrap.Register_module_linear(C.CString(name), f.linear, model.model)
+		ret_impl.linear = C.register_module_linear(C.CString(name), f.linear, model.model)
 	} else if f.conv2d != nil {
-		ret_impl.conv2d = wrap.Register_module_conv2d(C.CString(name), f.conv2d, model.model)
+		ret_impl.conv2d = C.register_module_conv2d(C.CString(name), f.conv2d, model.model)
 	} else if f.featureDropout != nil {
 		ret_impl.featureDropout =
-			wrap.Register_module_featureDropout(C.CString(name), f.featureDropout, model.model)
+			C.register_module_featureDropout(C.CString(name), f.featureDropout, model.model)
 	}
 	return ret_impl
 }
 
 func ModelInit() GoModel {
-	torhmodel := wrap.ModelInit()
+	torhmodel := C.modelInit()
 	gmodel := GoModel{model: torhmodel}
 	return gmodel
 }
 
 func Linear(a, b int) Impl {
 	impl := Impl{}
-	impl.linear = wrap.Linear(C.int(a), C.int(b))
+	impl.linear = C.linear(C.int(a), C.int(b))
 	return impl
 }
 
 func Conv2d(in_channels, out_channels, kernel_size int) Impl {
 	impl := Impl{}
-	impl.conv2d = wrap.Conv2d(C.int(in_channels), C.int(out_channels), C.int(kernel_size))
+	impl.conv2d = C.conv2d(C.int(in_channels), C.int(out_channels), C.int(kernel_size))
 	return impl
 }
 
 func FeatureDropout() Impl {
 	impl := Impl{}
-	impl.featureDropout = wrap.FeatureDropout()
+	impl.featureDropout = C.FeatureDropout()
 	return impl
 }
 
 func (model GoModel) Parameters() GoTensors {
 	var size C.int
-	wrap.Params_size(model.model, &size)
+	C.params_size(model.model, &size)
 	tensor_slice := make([]C.Tensor, size, size)
 	tensors := GoTensors{}
-	wrap.params(model.model, size, &(tensor_slice[0]))
+	C.params(model.model, size, &(tensor_slice[0]))
 	tensors.tensors = tensor_slice
 	return tensors
 }
 
 func (model GoModel) Is_training() bool {
-	if int(wrap.Istraining(model.model)) != 0 {
+	if int(C.istraining(model.model)) != 0 {
 		return true
 	} else {
 		return false
@@ -95,5 +100,33 @@ func (model GoModel) Is_training() bool {
 }
 
 func (model GoModel) Save(path string) {
-	wrap.Save(model.model, C.CString(path))
+	C.save(model.model, C.CString(path))
+}
+
+func Device(device string) GoDevice {
+	godevice := GoDevice{}
+	if device == "cuda" {
+		godevice.cuda = C.cuda_device()
+	} else if device == "cpu" {
+		godevice.cpu = C.cpu_device()
+	} else {
+		log.Fatal("Please input cpu or cuda")
+	}
+	return godevice
+}
+
+func (model *GoModel) To(device GoDevice) {
+	if device.cuda != nil {
+		C.model_to_cuda(model.model, device.cuda)
+	} else if device.cpu != nil {
+		C.model_to_cpu(model.model, device.cpu)
+	}
+}
+
+func Cuda_is_available() bool {
+	if C.cuda_is_available() == 0 {
+		return false
+	} else {
+		return true
+	}
 }

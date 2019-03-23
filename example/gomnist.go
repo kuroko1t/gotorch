@@ -11,6 +11,16 @@ func main() {
 
 	dataset := torch.MnistDataloader("./data", 64)
 	optimizer := torch.Opimizer(model.Parameters(), 0.01)
+
+	device := torch.GoDevice{}
+	if torch.Cuda_is_available() {
+		fmt.Println("gpu is available")
+		device = torch.Device("cuda")
+		model.To(device)
+	} else {
+		device = torch.Device("cpu")
+	}
+
 	for epoch := 0; epoch < 10; epoch++ {
 		batch_index := 0
 		for dataset.Next() {
@@ -18,8 +28,9 @@ func main() {
 			optimizer.Zero_grad()
 
 			batch := dataset.Data()
+			data := batch.To(device)
 
-			x := torch.Relu(fc1.Forward(batch.Reshape([]int{batch.Size(0), 784})))
+			x := torch.Relu(fc1.Forward(data.Reshape([]int{data.Size(0), 784})))
 			x = torch.Dropout(x, 0.5, model.Is_training())
 			x = torch.Relu(fc2.Forward(x))
 

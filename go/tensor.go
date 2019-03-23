@@ -27,10 +27,11 @@ package torch
 // #cgo LDFLAGS: -L${SRCDIR}/../libtorch/lib -L${SRCDIR}/../build -lgotorch -lpthread -lcaffe2 -lc10 -ltorch -lstdc++
 // #include "gotorch.h"
 import "C"
-import "github.com/kuroko1t/gotorch/go/wrap"
+import "log"
 
 type GoTensor struct {
 	tensor C.Tensor
+	device GoDevice
 }
 
 type GoTensors struct {
@@ -38,7 +39,7 @@ type GoTensors struct {
 }
 
 func (tensor GoTensor) Size(dim int) int {
-	return int(wrap.Tensor_size(tensor.tensor, C.int(dim)))
+	return int(C.tensor_size(tensor.tensor, C.int(dim)))
 }
 
 func (tensor GoTensor) Reshape(shapes []int) GoTensor {
@@ -47,7 +48,8 @@ func (tensor GoTensor) Reshape(shapes []int) GoTensor {
 		cshapes[i] = C.int(shape)
 	}
 	ret_tensor := GoTensor{}
-	ret_tensor.tensor = wrap.Tensor_reshape(tensor.tensor, &cshapes[0], C.int(len(shapes)))
+	ret_tensor.tensor = C.tensor_reshape(tensor.tensor, &cshapes[0], C.int(len(shapes)))
+	ret_tensor.device = tensor.device
 	return ret_tensor
 }
 
@@ -67,4 +69,35 @@ func (tensor GoTensor) View(shapes []int) GoTensor {
 	ret_tensor := GoTensor{}
 	ret_tensor.tensor = C.tensor_view(tensor.tensor, &cshapes[0], C.int(len(shapes)))
 	return ret_tensor
+}
+
+func (tensor *GoTensor) To(device GoDevice) GoTensor {
+	ret_tensor := GoTensor{}
+	if device.cuda != nil {
+		ret_tensor.tensor = C.tensor_to_cuda(tensor.tensor, device.cuda)
+	} else if device.cpu != nil {
+		ret_tensor.tensor = C.tensor_to_cpu(tensor.tensor, device.cpu)
+	}
+	ret_tensor.device = device
+	return ret_tensor
+}
+
+func (tensor GoTensor) Is_cuda() bool {
+	if C.tensor_is_cuda(tensor.tensor) != 0 {
+		return true
+	} else {
+		return false
+	}
+}
+
+func tensor_device_check(tensor GoTensor) {
+	if C.tensor_is_cuda(tensor.tensor) != 0 {
+		if tensor.device.cuda == nil {
+			log.Fatal("Tensor is gpu, but model is cpu")
+		}
+	} else {
+		if tensor.device.cpu == nil {
+			log.Fatal("Tensor is cpu, but model is gpu")
+		}
+	}
 }
