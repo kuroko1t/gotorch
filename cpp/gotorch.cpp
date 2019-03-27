@@ -207,6 +207,11 @@ Tensor tensor_reshape(Tensor tensor, int* shape, int size) {
   return (void*)ret_tensor;
 }
 
+int tensor_is_cuda(Tensor tensor) {
+  torch::Tensor *atensor = (torch::Tensor*)tensor;
+  return atensor->is_cuda();
+}
+
 void backward(Tensor tensor) {
   torch::Tensor *atensor = (torch::Tensor*)tensor;
   atensor->backward();
@@ -257,10 +262,52 @@ float tensor_item(Tensor tensor) {
   return atensor->item<float>();
 }
 
+Tensor tensor_to_device(Tensor tensor, CPU device) {
+  torch::Tensor *atensor = (torch::Tensor*)tensor;
+  torch::Device* device_re = (torch::Device*)device;
+  torch::Tensor *ret_tensor = new torch::Tensor();
+  *ret_tensor = atensor->to(*device_re);
+  return ret_tensor;
+}
+
+Tensor tensor_to_cuda(Tensor tensor, CUDA device) {
+  return tensor_to_device(tensor, device);
+}
+
+Tensor tensor_to_cpu(Tensor tensor, CPU device) {
+  return tensor_to_device(tensor, device);
+}
+
 void save(TModel model, const char *path) {
   std::string spath(path);
   TorchModel* tmodel = (TorchModel*) model;
   std::shared_ptr<torch::nn::Module> t1model =
     std::make_shared<torch::nn::Module>(*tmodel);
   torch::save(t1model, spath);
+}
+
+int cuda_is_available() {
+  return torch::cuda::is_available();
+}
+
+CUDA cuda_device() {
+  torch::Device *device = new torch::Device(torch::kCUDA);
+  return device;
+}
+
+CPU cpu_device() {
+  torch::Device *device = new torch::Device(torch::kCPU);
+  return device;
+}
+
+void model_to_cuda(TModel model, CUDA device) {
+  TorchModel* tmodel = (TorchModel*) model;
+  torch::Device* device_re = (torch::Device*)device;
+  tmodel->to(*device_re);
+}
+
+void model_to_cpu(TModel model, CPU device) {
+  TorchModel* tmodel = (TorchModel*) model;
+  torch::Device* device_re = (torch::Device*)device;
+  tmodel->to(*device_re);
 }

@@ -13,7 +13,18 @@ go get github.com/kuroko1t/gotorch
 ```
 $ cd gotorch
 $ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:`pwd`/build:`pwd`/libtorch/lib
-$ sh make.sh
+```
+
+## build
+
+* CPU
+```
+./make.sh
+```
+
+* GPU(cuda9.0)
+```
+./make.sh -g
 ```
 
 ## mnist sample

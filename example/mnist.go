@@ -11,6 +11,15 @@ func main() {
 
 	dataset := torch.MnistDataloader("./data", 64)
 	optimizer := torch.Opimizer(model.Parameters(), 0.01)
+
+	device := torch.GoDevice{}
+	if torch.Cuda_is_available() {
+		fmt.Println("gpu is available")
+		device = torch.Device("cuda")
+	} else {
+		device = torch.Device("cpu")
+	}
+	model.To(device)
 	for epoch := 0; epoch < 10; epoch++ {
 		batch_index := 0
 		for dataset.Next() {
@@ -18,13 +27,18 @@ func main() {
 			optimizer.Zero_grad()
 
 			batch := dataset.Data()
+			target := dataset.Target()
 
-			x := torch.Relu(fc1.Forward(batch.Reshape([]int{batch.Size(0), 784})))
+			// data to device
+			data := batch.To(device)
+			target_gpu := target.To(device)
+
+			x := torch.Relu(fc1.Forward(data.Reshape([]int{data.Size(0), 784})))
 			x = torch.Dropout(x, 0.5, model.Is_training())
 			x = torch.Relu(fc2.Forward(x))
 
 			prediction := torch.Log_Softmax(fc3.Forward(x), 1)
-			loss := torch.Nll_loss(prediction, dataset.Target())
+			loss := torch.Nll_loss(prediction, target_gpu)
 
 			// Compute gradients of the loss w.r.t. the parameters of our model.
 			loss.Backward()

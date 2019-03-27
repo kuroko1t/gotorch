@@ -11,6 +11,10 @@ func main() {
 	fc1 := model.Register_module("fc1", torch.Linear(320, 50))
 	fc2 := model.Register_module("fc2", torch.Linear(50, 10))
 
+	if torch.Cuda_is_available() {
+		fmt.Println("gpu is available")
+	}
+
 	dataset := torch.MnistDataloader("./data", 64)
 	optimizer := torch.Opimizer(model.Parameters(), 0.01)
 	for epoch := 0; epoch < 10; epoch++ {

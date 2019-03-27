@@ -23,10 +23,9 @@ SOFTWARE.
 */
 package torch
 
-// #cgo CFLAGS: -I${SRCDIR}/../libtorch/include/ -I${SRCDIR}/../libtorch/include/torch/csrc/api/include/ -I${SRCDIR}/../cpp
-// #cgo LDFLAGS: -L${SRCDIR}/../libtorch/lib -L${SRCDIR}/../build -lgotorch -lpthread -lcaffe2 -lc10 -ltorch -lstdc++
 // #include "gotorch.h"
 import "C"
+import "log"
 
 type Impl struct {
 	conv2d         C.Conv2dImpl
@@ -36,6 +35,11 @@ type Impl struct {
 
 type GoModel struct {
 	model C.TModel
+}
+
+type GoDevice struct {
+	cuda C.CUDA
+	cpu  C.CPU
 }
 
 func (model GoModel) Register_module(name string, f Impl) Impl {
@@ -95,4 +99,32 @@ func (model GoModel) Is_training() bool {
 
 func (model GoModel) Save(path string) {
 	C.save(model.model, C.CString(path))
+}
+
+func Device(device string) GoDevice {
+	godevice := GoDevice{}
+	if device == "cuda" {
+		godevice.cuda = C.cuda_device()
+	} else if device == "cpu" {
+		godevice.cpu = C.cpu_device()
+	} else {
+		log.Fatal("Please input cpu or cuda")
+	}
+	return godevice
+}
+
+func (model *GoModel) To(device GoDevice) {
+	if device.cuda != nil {
+		C.model_to_cuda(model.model, device.cuda)
+	} else if device.cpu != nil {
+		C.model_to_cpu(model.model, device.cpu)
+	}
+}
+
+func Cuda_is_available() bool {
+	if C.cuda_is_available() == 0 {
+		return false
+	} else {
+		return true
+	}
 }
