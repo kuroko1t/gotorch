@@ -16,11 +16,10 @@ func main() {
 	if torch.Cuda_is_available() {
 		fmt.Println("gpu is available")
 		device = torch.Device("cuda")
-		model.To(device)
 	} else {
 		device = torch.Device("cpu")
 	}
-
+	model.To(device)
 	for epoch := 0; epoch < 10; epoch++ {
 		batch_index := 0
 		for dataset.Next() {
