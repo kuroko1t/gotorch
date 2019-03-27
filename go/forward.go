@@ -28,7 +28,7 @@ import "C"
 
 func (impl Impl) Forward(tensor GoTensor) GoTensor {
 	ret_gtensor := GoTensor{}
-	tensor_device_check(tensor)
+	//tensor_device_check(tensor)
 	if impl.linear != nil {
 		ret_gtensor.tensor = C.forward_linear(impl.linear, tensor.tensor)
 	} else if impl.conv2d != nil {

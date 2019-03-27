@@ -19,12 +19,12 @@ $ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:`pwd`/build:`pwd`/libtorch/lib
 
 * CPU
 ```
-sh make.sh
+./make.sh
 ```
 
 * GPU(cuda9.0)
 ```
-sh make.sh -g
+./make.sh -g
 ```
 
 ## mnist sample

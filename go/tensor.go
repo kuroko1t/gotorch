@@ -25,7 +25,7 @@ package torch
 
 // #include "gotorch.h"
 import "C"
-import "log"
+//import "log"
 
 type GoTensor struct {
 	tensor C.Tensor
@@ -88,10 +88,10 @@ func (tensor GoTensor) Is_cuda() bool {
 	}
 }
 
-func tensor_device_check(tensor GoTensor) {
-	if C.tensor_is_cuda(tensor.tensor) != 0 {
-		if tensor.device.cuda == nil {
-			log.Fatal("Tensor is gpu, but model is cpu")
-		}
-	}
-}
+//func tensor_device_check(tensor GoTensor) {
+// 	if C.tensor_is_cuda(tensor.tensor) != 0 {
+// 		if tensor.device.cuda == nil {
+// 			log.Fatal("Tensor is gpu, but model is cpu")
+// 		}
+// 	}
+//}
