@@ -47,10 +47,9 @@ fi
 GOTORCH_DIR=$(pwd)
 
 if [ "$FLAG_GPU" ]; then
-    echo "koko"
     clang++ -Wall -g --std=c++11 -shared  -fPIC -D_GLIBCXX_USE_CXX11_ABI=0 -I$GOTORCH_DIR/cpp -I$GOTORCH_DIR/libtorch/include/ -I$GOTORCH_DIR/libtorch/include/torch/csrc/api/include/ \
         -L$GOTORCH_DIR/libtorch/lib -lcaffe2 -lc10 -ltorch -lpthread -lcuda -lnvrtc cpp/gotorch.cpp -o build/libgotorch.so
 else
     clang++ -Wall -g --std=c++11 -shared  -fPIC -D_GLIBCXX_USE_CXX11_ABI=0 -I$GOTORCH_DIR/cpp -I$GOTORCH_DIR/libtorch/include/ -I$GOTORCH_DIR/libtorch/include/torch/csrc/api/include/ \
-        -L$GOTORCH_DIR/libtorch/lib -lcaffe2 -lc10 -ltorch -lpthread cpp/gotorch.cpp -o build/libgotorch.so
+        -L$GOTORCH_DIR/libtorch/lib -Wl,-rpath,$GOTORCH_DIR/libtorch/lib -lcaffe2 -lc10 -ltorch -lpthread cpp/gotorch.cpp -o build/libgotorch.so
 fi

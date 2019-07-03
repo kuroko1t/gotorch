@@ -186,24 +186,26 @@ int tensor_size(Tensor tensor, int dim) {
 
 Tensor tensor_view(Tensor tensor, int* shape, int size) {
   torch::Tensor *atensor = (torch::Tensor*)tensor;
-  std::vector<long> x;
+  std::vector<int64_t> x;
   for (int i=0; i < size; i++) {
-    x.push_back((long)shape[i]);
+    x.push_back((int64_t)shape[i]);
   }
+  c10::IntArrayRef x1 = c10::IntArrayRef(x);
   torch::Tensor *ret_tensor = new torch::Tensor();
-  *ret_tensor = atensor->view(x);
+  *ret_tensor = atensor->view(x1);
   return ret_tensor;
 }
 
 
 Tensor tensor_reshape(Tensor tensor, int* shape, int size) {
   torch::Tensor *atensor = (torch::Tensor*)tensor;
-  std::vector<long> x;
+  std::vector<int64_t> x;
   for (int i = 0; i < size; i++) {
-    x.push_back((long)shape[i]);
+    x.push_back((int64_t)shape[i]);
   }
   torch::Tensor *ret_tensor = new torch::Tensor();
-  *ret_tensor = atensor->reshape(x);
+  c10::IntArrayRef x1 = c10::IntArrayRef(x);
+  *ret_tensor = atensor->reshape(x1);
   return (void*)ret_tensor;
 }
 
