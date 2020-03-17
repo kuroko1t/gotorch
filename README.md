@@ -1,6 +1,6 @@
 # gotorch
 
-gobinding for pytorch.
+gobinding for pytorch. please contibute this project
 
 ## Install
 
