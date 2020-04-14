@@ -22,7 +22,7 @@ $ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:`pwd`/build:`pwd`/libtorch/lib
 ./make.sh
 ```
 
-* GPU(cuda9.0)
+* GPU
 ```
 ./make.sh -g
 ```
