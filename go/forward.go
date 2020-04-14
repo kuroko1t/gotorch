@@ -33,9 +33,10 @@ func (impl Impl) Forward(tensor GoTensor) GoTensor {
 		ret_gtensor.tensor = C.forward_linear(impl.linear, tensor.tensor)
 	} else if impl.conv2d != nil {
 		ret_gtensor.tensor = C.forward_conv2d(impl.conv2d, tensor.tensor)
-	} else if impl.featureDropout != nil {
-		ret_gtensor.tensor = C.forward_featureDropout(impl.featureDropout, tensor.tensor)
 	}
+	//else if impl.featureDropout != nil {
+	// 	ret_gtensor.tensor = C.forward_featureDropout(impl.featureDropout, tensor.tensor)
+	//}
 	return ret_gtensor
 }
 

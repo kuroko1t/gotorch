@@ -91,14 +91,14 @@ Conv2dImpl register_module_conv2d(const char *name, Conv2dImpl conv2d, TModel mo
   return ((mod_re->register_module(str, conv2d_re_sh)).get());
 }
 
-FeatureDropoutImpl register_module_featureDropout(const char *name,
-                                                  FeatureDropoutImpl featuredrop, TModel mod) {
-  std::string str(name);
-  TorchModel *mod_re = (TorchModel*)mod;
-  torch::nn::FeatureDropoutImpl *featuredrop_re = (torch::nn::FeatureDropoutImpl*)featuredrop;
-  std::shared_ptr<torch::nn::FeatureDropoutImpl> featuredrop_re_sh(featuredrop_re);
-  return ((mod_re->register_module(str, featuredrop_re_sh)).get());
-}
+//FeatureDropoutImpl register_module_featureDropout(const char *name,
+//                                                  FeatureDropoutImpl featuredrop, TModel mod) {
+//  std::string str(name);
+//  TorchModel *mod_re = (TorchModel*)mod;
+//  torch::nn::FeatureDropoutImpl *featuredrop_re = (torch::nn::FeatureDropoutImpl*)featuredrop;
+//  std::shared_ptr<torch::nn::FeatureDropoutImpl> featuredrop_re_sh(featuredrop_re);
+//  return ((mod_re->register_module(str, featuredrop_re_sh)).get());
+//}
 
 
 Conv2dImpl conv2d(int in_channels, int out_channels, int kernel_size) {
@@ -106,11 +106,11 @@ Conv2dImpl conv2d(int in_channels, int out_channels, int kernel_size) {
   return conv2d;
 }
 
-FeatureDropoutImpl FeatureDropout() {
-  torch::nn::FeatureDropoutImpl *conv_drop =
-    new torch::nn::FeatureDropoutImpl();
-  return conv_drop;
-}
+//FeatureDropoutImpl FeatureDropout() {
+//  torch::nn::FeatureDropoutImpl *conv_drop =
+//    new torch::nn::FeatureDropoutImpl();
+//  return conv_drop;
+//}
 
 Tensor forward_linear(LinearImpl linear, Tensor tensor) {
   torch::nn::LinearImpl* plinear = (torch::nn::LinearImpl*)linear;
@@ -130,20 +130,20 @@ Tensor forward_conv2d(Conv2dImpl conv2d, Tensor tensor) {
   return (void*)go_atensor;
 }
 
-Tensor forward_featureDropout(FeatureDropoutImpl featuredrop, Tensor tensor) {
-  torch::nn::FeatureDropoutImpl* featuredrop_re = (torch::nn::FeatureDropoutImpl*)featuredrop;
-  torch::Tensor* ptensor = (torch::Tensor*)tensor;
-  torch::Tensor *atensor = new torch::Tensor();
-  torch::Tensor* go_atensor = (torch::Tensor*)atensor;
-  *go_atensor = featuredrop_re->forward(*ptensor);
-  return (void*)go_atensor;
-}
+//Tensor forward_featureDropout(FeatureDropoutImpl featuredrop, Tensor tensor) {
+//  torch::nn::FeatureDropoutImpl* featuredrop_re = (torch::nn::FeatureDropoutImpl*)featuredrop;
+//  torch::Tensor* ptensor = (torch::Tensor*)tensor;
+//  torch::Tensor *atensor = new torch::Tensor();
+//  torch::Tensor* go_atensor = (torch::Tensor*)atensor;
+//  *go_atensor = featuredrop_re->forward(*ptensor);
+//  return (void*)go_atensor;
+//}
 
-using mnistDataset = torch::data::StatelessDataLoader<
-        torch::data::datasets::MapDataset<
-            torch::data::datasets::MNIST,
-            torch::data::transforms::Stack<torch::data::Example<>>>,
-        torch::data::samplers::RandomSampler>;
+//using mnistDataset = torch::data::StatelessDataLoader<
+//        torch::data::datasets::MapDataset<
+//            torch::data::datasets::MNIST,
+//            torch::data::transforms::Stack<torch::data::Example<>>>,
+//        torch::data::samplers::RandomSampler>;
 
 //using example_data = torch::data::Example<at::Tensor, at::Tensor>;
 
