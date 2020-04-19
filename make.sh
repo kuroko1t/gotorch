@@ -28,9 +28,9 @@ fi
 
 if [ "$FLAG_GPU" ]; then
     if [ ! -e libtorch ]; then
-        wget https://download.pytorch.org/libtorch/nightly/cu102/libtorch-shared-with-deps-latest.zip
-        unzip libtorch-shared-with-deps-latest.zip
-        rm -f libtorch-shared-with-deps-latest.zip
+        wget https://download.pytorch.org/libtorch/cu101/libtorch-shared-with-deps-1.4.0.zip
+        unzip libtorch-shared-with-deps-1.4.0.zip
+        rm -f libtorch-shared-with-deps-1.4.0.zip
     fi
 else
     if [ ! -e libtorch ]; then
@@ -48,7 +48,7 @@ GOTORCH_DIR=$(pwd)
 
 if [ "$FLAG_GPU" ]; then
     clang++ -Wall -g  -shared  -fPIC -D_GLIBCXX_USE_CXX14_ABI=0 -I$GOTORCH_DIR/cpp -I$GOTORCH_DIR/libtorch/include/ -I$GOTORCH_DIR/libtorch/include/torch/csrc/api/include/ \
-        -L$GOTORCH_DIR/libtorch/lib -lc10 -ltorch -ltorch_cpu -ltorch_cuda -lpthread -lcuda -lnvrtc-builtins cpp/gotorch.cpp -o build/libgotorch.so
+        -L$GOTORCH_DIR/libtorch/lib -lc10 -ltorch -lpthread -lcuda -lnvrtc-builtins cpp/gotorch.cpp -o build/libgotorch.so
 else
     clang++ -Wall -g -shared  -fPIC -D_GLIBCXX_USE_CXX11_ABI=0 -I$GOTORCH_DIR/cpp -I$GOTORCH_DIR/libtorch/include/ -I$GOTORCH_DIR/libtorch/include/torch/csrc/api/include/ \
         -L$GOTORCH_DIR/libtorch/lib -Wl,-rpath,$GOTORCH_DIR/libtorch/lib  -lc10 -ltorch -lpthread cpp/gotorch.cpp -o build/libgotorch.so
