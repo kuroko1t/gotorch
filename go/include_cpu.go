@@ -30,3 +30,4 @@ package torch
 // #cgo LDFLAGS: -lpthread -lstdc++
 // #cgo CXXFLAGS: -I${SRCDIR}/../libtorch/include/ -I${SRCDIR}/../libtorch/include/torch/csrc/api/include/ -I${SRCDIR}/../cpp
 import "C"
+
