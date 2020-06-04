@@ -27,6 +27,7 @@ $ cd gotorch
 $ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:`pwd`/build:`pwd`/libtorch/lib
 ```
 
+
 ## Support
 
 * Pytorch 1.5.0
@@ -35,6 +36,12 @@ $ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:`pwd`/build:`pwd`/libtorch/lib
 
 ```
 $ go run example/gomnist.go
+```
+
+If you don't have a GPU.
+
+```
+$ go run example/gomnist.go -tags cpu
 ```
 
 code sample
