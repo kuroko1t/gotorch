@@ -8,14 +8,7 @@ gobinding for pytorch. please contibute this project
 go get github.com/kuroko1t/gotorch
 ```
 
-## setting
-
-```
-$ cd gotorch
-$ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:`pwd`/build:`pwd`/libtorch/lib
-```
-
-## build
+## Download Libtorch
 
 * CPU
 ```
@@ -26,6 +19,17 @@ $ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:`pwd`/build:`pwd`/libtorch/lib
 ```
 ./make.sh -g
 ```
+
+## setting
+
+```
+$ cd gotorch
+$ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:`pwd`/build:`pwd`/libtorch/lib
+```
+
+## Support
+
+* Pytorch 1.5.0
 
 ## mnist sample
 
