@@ -22,6 +22,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 package torch
-// #cgo CFLAGS: -I${SRCDIR}/../libtorch/include/ -I${SRCDIR}/../libtorch/include/torch/csrc/api/include/ -I${SRCDIR}/../cpp
-// #cgo LDFLAGS: -L${SRCDIR}/../libtorch/lib -L${SRCDIR}/../build -lgotorch -lpthread -lstdc++
+
+// #cgo CXXFLAGS: -Wall -g -D_GLIBCXX_USE_CXX14_ABI=0 -I${SRCDIR} -I$GOTORCH_DIR/libtorch/include/ -I$GOTORCH_DIR/libtorch/include/torch/csrc/api/include/
+// #cgo LDFLAGS: -L${SRCDIR}/../libtorch/lib -lc10 -ltorch -lpthread -lcuda -ltorch_cpu -ltorch_cuda
+// #cgo LDFLAGS: -lpthread -lstdc++
+// #cgo CXXFLAGS: -I${SRCDIR}/../libtorch/include/ -I${SRCDIR}/../libtorch/include/torch/csrc/api/include/ -I${SRCDIR}/../cpp
 import "C"
