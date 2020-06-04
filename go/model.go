@@ -30,7 +30,7 @@ import "log"
 type Impl struct {
 	conv2d         C.Conv2dImpl
 	linear         C.LinearImpl
-	featureDropout C.FeatureDropoutImpl
+	featureDropout C.Dropout2dImpl
 }
 
 type GoModel struct {

@@ -28,4 +28,4 @@ jobs:
     - name: Test
       run: |
            export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:`pwd`/build:`pwd`/libtorch/lib
-           go test -v ./test
+           go test -tags cpu -v ./test 

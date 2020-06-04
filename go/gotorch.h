@@ -29,7 +29,7 @@ extern "C" {
   /* Operation Impl */
   typedef void* LinearImpl;
   typedef void* Conv2dImpl;
-  typedef void* FeatureDropoutImpl;
+  typedef void* Dropout2dImpl;
 
   typedef void* ATensor;
   typedef void* Module;
@@ -57,13 +57,13 @@ extern "C" {
   Conv2dImpl conv2d(int in_channels, int out_channels, int kernel_size);
   Conv2dImpl register_module_conv2d(const char *name, Conv2dImpl conv2d, TModel mod);
 
-  FeatureDropoutImpl FeatureDropout();
-  FeatureDropoutImpl register_module_featureDropout(const char *name,
-                                                    FeatureDropoutImpl featuredrop, TModel mod);
+  Dropout2dImpl FeatureDropout();
+  Dropout2dImpl register_module_featureDropout(const char *name,
+					       Dropout2dImpl featuredrop, TModel mod);
 
   Tensor forward_linear(LinearImpl mod, Tensor tensor);
   Tensor forward_conv2d(Conv2dImpl conv2d, Tensor tensor);
-  Tensor forward_featureDropout(FeatureDropoutImpl featuredrop, Tensor tensor);
+  Tensor forward_featureDropout(Dropout2dImpl featuredrop, Tensor tensor);
 
   int data_loader_size(const char *path, int batch_size);
   void data_loader(const char *path, int batch_size,

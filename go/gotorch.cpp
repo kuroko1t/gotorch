@@ -91,12 +91,12 @@ Conv2dImpl register_module_conv2d(const char *name, Conv2dImpl conv2d, TModel mo
   return ((mod_re->register_module(str, conv2d_re_sh)).get());
 }
 
-FeatureDropoutImpl register_module_featureDropout(const char *name,
-                                                  FeatureDropoutImpl featuredrop, TModel mod) {
+Dropout2dImpl register_module_featureDropout(const char *name,
+					     Dropout2dImpl featuredrop, TModel mod) {
   std::string str(name);
   TorchModel *mod_re = (TorchModel*)mod;
-  torch::nn::FeatureDropoutImpl *featuredrop_re = (torch::nn::FeatureDropoutImpl*)featuredrop;
-  std::shared_ptr<torch::nn::FeatureDropoutImpl> featuredrop_re_sh(featuredrop_re);
+  torch::nn::Dropout2dImpl *featuredrop_re = (torch::nn::Dropout2dImpl*)featuredrop;
+  std::shared_ptr<torch::nn::Dropout2dImpl> featuredrop_re_sh(featuredrop_re);
   return ((mod_re->register_module(str, featuredrop_re_sh)).get());
 }
 
@@ -106,9 +106,9 @@ Conv2dImpl conv2d(int in_channels, int out_channels, int kernel_size) {
   return conv2d;
 }
 
-FeatureDropoutImpl FeatureDropout() {
-  torch::nn::FeatureDropoutImpl *conv_drop =
-    new torch::nn::FeatureDropoutImpl();
+Dropout2dImpl FeatureDropout() {
+  torch::nn::Dropout2dImpl *conv_drop =
+    new torch::nn::Dropout2dImpl();
   return conv_drop;
 }
 
@@ -130,8 +130,8 @@ Tensor forward_conv2d(Conv2dImpl conv2d, Tensor tensor) {
   return (void*)go_atensor;
 }
 
-Tensor forward_featureDropout(FeatureDropoutImpl featuredrop, Tensor tensor) {
-  torch::nn::FeatureDropoutImpl* featuredrop_re = (torch::nn::FeatureDropoutImpl*)featuredrop;
+Tensor forward_featureDropout(Dropout2dImpl featuredrop, Tensor tensor) {
+  torch::nn::Dropout2dImpl* featuredrop_re = (torch::nn::Dropout2dImpl*)featuredrop;
   torch::Tensor* ptensor = (torch::Tensor*)tensor;
   torch::Tensor *atensor = new torch::Tensor();
   torch::Tensor* go_atensor = (torch::Tensor*)atensor;
@@ -155,7 +155,7 @@ int data_loader_size(const char *path, int batch_size) {
       batch_size);
   int size = 0;
   for (auto& x : *dataset) {
-      size +=1;
+    size +=1;
   }
   return size;
 }
