@@ -20,17 +20,12 @@ go get github.com/kuroko1t/gotorch
 ./make.sh -g
 ```
 
-## setting
+## Setting
 
 ```
 $ cd gotorch
 $ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:`pwd`/build:`pwd`/libtorch/lib
 ```
-
-
-## Support
-
-* Pytorch 1.5.0
 
 ## mnist sample
 
@@ -92,6 +87,10 @@ func main() {
 
 
 ```
+
+## Support
+
+* Pytorch 1.5.0
 
 
 ## License
