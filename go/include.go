@@ -1,3 +1,5 @@
+// +build !cpu
+
 /*
 MIT License
 
