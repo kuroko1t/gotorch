@@ -28,7 +28,7 @@ if [ "$FLAG_GPU" ]; then
 else
     if [ ! -e libtorch ]; then
         wget https://download.pytorch.org/libtorch/cpu/libtorch-shared-with-deps-1.5.0%2Bcpu.zip
-        unzip libtorch-shared-with-deps-1.5.0%2Bcpu.zip
-        rm -f libtorch-shared-with-deps-1.5.0%2Bcpu.zip
+        unzip libtorch-shared-with-deps-1.5.0+cpu.zip
+        rm -f libtorch-shared-with-deps-1.5.0+cpu.zip
     fi
 fi
