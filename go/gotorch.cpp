@@ -155,7 +155,7 @@ int data_loader_size(const char *path, int batch_size) {
       batch_size);
   int size = 0;
   for (auto& x : *dataset) {
-      size +=1;
+    size +=1;
   }
   return size;
 }
