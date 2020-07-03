@@ -23,9 +23,9 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Build
-      run: bash make.sh
+      run: bash download.sh
 
     - name: Test
       run: |
            export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:`pwd`/build:`pwd`/libtorch/lib
-           go test -tags cpu -v ./test 
+           go test -tags cpu -v ./test
