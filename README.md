@@ -12,12 +12,12 @@ go get github.com/kuroko1t/gotorch
 
 * CPU
 ```
-./make.sh
+./download.sh
 ```
 
 * GPU
 ```
-./make.sh -g
+./download.sh -g
 ```
 
 ## Setting
