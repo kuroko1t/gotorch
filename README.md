@@ -24,7 +24,7 @@ go get github.com/kuroko1t/gotorch
 
 ```
 $ cd gotorch
-$ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:`pwd`/build:`pwd`/libtorch/lib
+$ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:`pwd`/libtorch/lib
 ```
 
 ## mnist sample
@@ -36,7 +36,7 @@ $ go run example/gomnist.go
 If you don't have a GPU.
 
 ```
-$ go run example/gomnist.go -tags cpu
+$ go run -tags cpu example/gomnist.go
 ```
 
 code sample
@@ -90,8 +90,7 @@ func main() {
 
 ## Support
 
-* Pytorch 1.5.0
-
+* Pytorch 1.6.0
 
 ## License
 MIT
