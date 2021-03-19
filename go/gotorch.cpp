@@ -23,6 +23,7 @@ SOFTWARE.
 */
 
 #include <torch/torch.h>
+#include <torch/script.h>
 #include <gotorch.h>
 
 struct TorchModel : public torch::nn::Module {
@@ -296,6 +297,13 @@ void save(TModel model, const char *path) {
   std::shared_ptr<torch::nn::Module> t1model =
     std::make_shared<torch::nn::Module>(*tmodel);
   torch::save(t1model, spath);
+}
+
+TModel load(const char *path) {
+  std::string spath(path);
+  torch::jit::script::Module *model = new torch::jit::script::Module();
+  *model = torch::jit::load(spath);
+  return (void*)model;
 }
 
 int cuda_is_available() {

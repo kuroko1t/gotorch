@@ -101,6 +101,13 @@ func (model GoModel) Save(path string) {
 	C.save(model.model, C.CString(path))
 }
 
+func Load(path string) GoModel{
+    model := ModelInit()
+	model.model = C.load(C.CString(path))
+    return model
+}
+
+
 func Device(device string) GoDevice {
 	godevice := GoDevice{}
 	if device == "cuda" {
