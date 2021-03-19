@@ -299,11 +299,22 @@ void save(TModel model, const char *path) {
   torch::save(t1model, spath);
 }
 
-TModel load(const char *path) {
+TModule load(const char *path) {
   std::string spath(path);
-  torch::jit::script::Module *model = new torch::jit::script::Module();
-  *model = torch::jit::load(spath);
-  return (void*)model;
+  torch::jit::script::Module *module = new torch::jit::script::Module();
+  *module = torch::jit::load(spath);
+  return (void*)module;
+}
+
+ATensor forward_module(TModule module, ATensor atensor) {
+  torch::jit::script::Module* tmodule = (torch::jit::script::Module*) module;
+  //std::shared_ptr<torch::jit::script::Module> t1module =
+  //  std::make_shared<torch::jit::script::Module>(*module);
+
+  at::Tensor *t1atensor = (at::Tensor*)atensor;
+  at::Tensor *output = new at::Tensor();
+  *output = tmodule->forward({*t1atensor});
+  return (void*)output;
 }
 
 int cuda_is_available() {
