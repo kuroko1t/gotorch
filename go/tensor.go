@@ -32,6 +32,11 @@ type GoTensor struct {
 	device GoDevice
 }
 
+type ATensor struct {
+	atensor C.ATensor
+	device GoDevice
+}
+    
 type GoTensors struct {
 	tensors []C.Tensor
 }
@@ -86,6 +91,16 @@ func (tensor GoTensor) Is_cuda() bool {
 	} else {
 		return false
 	}
+}
+
+func Randn(shapes []int) GoTensor {
+    cshapes := make([]C.int, len(shapes))
+	for i, shape := range shapes {
+		cshapes[i] = C.int(shape)
+	}
+    ret_tensor := GoTensor{}
+    ret_tensor.tensor = C.Randn(&cshapes[0], C.int(len(shapes)))
+    return ret_tensor
 }
 
 //func tensor_device_check(tensor GoTensor) {

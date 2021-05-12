@@ -34,6 +34,16 @@ LinearImpl linear(int a, int b) {
   return linear;
 }
 
+Tensor Randn(int* shape, int size) {
+  torch::Tensor *tensor = new torch::Tensor();
+  std::vector<int64_t> x;
+  for (int i=0; i < size; i++) {
+    x.push_back((int64_t)shape[i]);
+  }
+  *tensor = torch::randn(x);
+  return (void*)tensor;
+}
+
 TModel modelInit() {
   TorchModel *mod= new TorchModel();
   return (void*)mod;
@@ -313,3 +323,12 @@ void model_to_cpu(TModel model, CPU device) {
   torch::Device* device_re = (torch::Device*)device;
   tmodel->to(*device_re);
 }
+
+float32vec AtensorToVec(ATensor atensor) {
+  //std::vector<float> *vec = new std::vector<float>();
+  at::Tensor *ori_atensor = (at::Tensor*)atensor;
+  //vec = ori_tensor->data_ptr();
+  //return vec;
+  std::vector<float> *v = new std::vector<float>((*ori_atensor).data_ptr<float>(), (*ori_atensor).data_ptr<float>() + (*ori_atensor).numel());
+  return (void*)v;
+} 

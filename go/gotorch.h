@@ -42,6 +42,13 @@ extern "C" {
   typedef void* CUDA;
   typedef void* CPU;
 
+  typedef void* float32vec;
+
+  /* make tensor */
+
+  Tensor Randn(int* shape, int size);
+  /*******/
+
   TModel modelInit();
   void params_size(TModel model, int *size);
   void params(TModel model, int size, Tensor *tensor);
@@ -96,6 +103,8 @@ extern "C" {
   CPU cpu_device();
   void model_to_cuda(TModel model, CUDA device);
   void model_to_cpu(TModel model, CPU device);
+
+  float32vec AtensorToVec(ATensor atensor);
 #ifdef __cplusplus
 }
 #endif
