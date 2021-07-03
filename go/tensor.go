@@ -25,7 +25,11 @@ package torch
 
 // #include "gotorch.h"
 import "C"
-//import "log"
+import (
+    "reflect"
+    "unsafe"
+    "fmt"
+)
 
 type Tensor struct {
 	tensor C.Tensor
@@ -42,10 +46,21 @@ type Tensors struct {
 }
 
 func (atensor ATensor) Value() []float32 {
-	tensor_size := C.AtensorSize(atensor.atensor)
-	tensor_value := make([]float32, int(tensor_size))
-	&tensor_value[0] = C.AtensorToVec(atensor.atensor)
+	tensor_size := (int)(C.AtensorSize(atensor.atensor))
+	tensor_value := make([]float32, tensor_size)
+	h := (*reflect.SliceHeader)((unsafe.Pointer)(&tensor_value))
+	h.Data = (uintptr)((unsafe.Pointer)(C.AtensorToVec(atensor.atensor)))
+	h.Len = tensor_size
+	h.Cap = tensor_size
+	for _, tv := range tensor_value {
+		fmt.Println(tv)
+	}
+	return tensor_value
+	//&tensor_value[0] = C.AtensorToVec(atensor.atensor)
 	//float32vec AtensorToVec(ATensor atensor)
+    //for i, _ := range tensor_value {
+    //    tensor_value[i] = float32(C.AtensorToVec(atensor.atensor)[i])
+    //}
 }
 
 
