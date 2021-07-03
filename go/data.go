@@ -45,14 +45,14 @@ type ExampleData struct {
 	target  []C.Tensor
 }
 
-func (it *ExampleData) Data() GoTensor {
-	ret_tensor := GoTensor{}
+func (it *ExampleData) Data() Tensor {
+	ret_tensor := Tensor{}
 	ret_tensor.tensor = it.data[it.current]
 	return ret_tensor
 }
 
-func (it *ExampleData) Target() GoTensor {
-	ret_tensor := GoTensor{}
+func (it *ExampleData) Target() Tensor {
+	ret_tensor := Tensor{}
 	ret_tensor.tensor = it.target[it.current]
 	return ret_tensor
 }

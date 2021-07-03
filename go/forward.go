@@ -26,8 +26,8 @@ package torch
 // #include "gotorch.h"
 import "C"
 
-func (impl Impl) Forward(tensor GoTensor) GoTensor {
-	ret_gtensor := GoTensor{}
+func (impl Impl) Forward(tensor Tensor) Tensor {
+	ret_gtensor := Tensor{}
 	//tensor_device_check(tensor)
 	if impl.linear != nil {
 		ret_gtensor.tensor = C.forward_linear(impl.linear, tensor.tensor)
@@ -39,26 +39,26 @@ func (impl Impl) Forward(tensor GoTensor) GoTensor {
 	return ret_gtensor
 }
 
-func Log_Softmax(tensor GoTensor, dim int) GoTensor {
-	ret_gtensor := GoTensor{}
+func Log_Softmax(tensor Tensor, dim int) Tensor {
+	ret_gtensor := Tensor{}
 	ret_gtensor.tensor = C.log_softmax(tensor.tensor, C.int(dim))
 	return ret_gtensor
 }
 
-func Nll_loss(tensor, target GoTensor) GoTensor {
-	ret_gtensor := GoTensor{}
+func Nll_loss(tensor, target Tensor) Tensor {
+	ret_gtensor := Tensor{}
 	ret_gtensor.tensor = C.tensor_nll_loss(tensor.tensor, target.tensor)
 	return ret_gtensor
 }
 
-func Relu(tensor GoTensor) GoTensor {
-	ret_gtensor := GoTensor{}
+func Relu(tensor Tensor) Tensor {
+	ret_gtensor := Tensor{}
 	ret_gtensor.tensor = C.relu(tensor.tensor)
 	return ret_gtensor
 }
 
-func Dropout(tensor GoTensor, lr float32, is_training bool) GoTensor {
-	ret_gtensor := GoTensor{}
+func Dropout(tensor Tensor, lr float32, is_training bool) Tensor {
+	ret_gtensor := Tensor{}
 	is_training_int := 0
 	if is_training {
 		is_training_int = 1
@@ -67,8 +67,8 @@ func Dropout(tensor GoTensor, lr float32, is_training bool) GoTensor {
 	return ret_gtensor
 }
 
-func Max_pool2d(tensor GoTensor, kernel_size int) GoTensor {
-	ret_gtensor := GoTensor{}
+func Max_pool2d(tensor Tensor, kernel_size int) Tensor {
+	ret_gtensor := Tensor{}
 	ret_gtensor.tensor = C.max_pool2d(tensor.tensor, C.int(kernel_size))
 	return ret_gtensor
 }

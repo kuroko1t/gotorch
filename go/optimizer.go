@@ -30,7 +30,7 @@ type SGD struct {
 	param C.SGD
 }
 
-func Opimizer(tensors GoTensors, lr float32) SGD {
+func Opimizer(tensors Tensors, lr float32) SGD {
 	sgd := SGD{}
 	sgd.param = C.optimizer_sgd(&tensors.tensors[0], C.float(lr), C.int(len(tensors.tensors)))
 	return sgd
