@@ -106,7 +106,11 @@ extern "C" {
   void model_to_cuda(TModel model, CUDA device);
   void model_to_cpu(TModel model, CPU device);
 
-  float32vec AtensorToVec(ATensor atensor);
+  int AtensorSize(ATensor atensor);
+  size_t AtensorDim(ATensor atensor, size_t dim);
+  float* AtensorToVec(ATensor atensor);
+
+
 #ifdef __cplusplus
 }
 #endif

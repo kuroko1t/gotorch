@@ -308,12 +308,15 @@ TModule load(const char *path) {
 
 ATensor forward_module(TModule module, ATensor atensor) {
   torch::jit::script::Module* tmodule = (torch::jit::script::Module*) module;
-  //std::shared_ptr<torch::jit::script::Module> t1module =
-  //  std::make_shared<torch::jit::script::Module>(*module);
+  std::shared_ptr<torch::jit::script::Module> t1module =
+    std::make_shared<torch::jit::script::Module>(*tmodule);
 
   at::Tensor *t1atensor = (at::Tensor*)atensor;
   at::Tensor *output = new at::Tensor();
-  *output = tmodule->forward({*t1atensor});
+  std::vector<torch::jit::IValue> inputs;
+  inputs.push_back(*t1atensor);
+  //*output = tmodule->forward({*t1atensor});
+  *output = tmodule->forward(inputs).toTensor();
   return (void*)output;
 }
 
@@ -343,11 +346,22 @@ void model_to_cpu(TModel model, CPU device) {
   tmodel->to(*device_re);
 }
 
-float32vec AtensorToVec(ATensor atensor) {
+int AtensorSize(ATensor atensor) {
+  at::Tensor *ori_atensor = (at::Tensor*)atensor;
+  return ori_atensor->numel();
+}
+
+size_t AtensorDim(ATensor atensor, size_t dim) {
+  at::Tensor *ori_atensor = (at::Tensor*)atensor;
+  return ori_atensor->size(dim);
+}
+
+float* AtensorToVec(ATensor atensor) {
   //std::vector<float> *vec = new std::vector<float>();
   at::Tensor *ori_atensor = (at::Tensor*)atensor;
   //vec = ori_tensor->data_ptr();
   //return vec;
   std::vector<float> *v = new std::vector<float>((*ori_atensor).data_ptr<float>(), (*ori_atensor).data_ptr<float>() + (*ori_atensor).numel());
-  return (void*)v;
-} 
+  //return (void*)v;
+  return v->data();
+}

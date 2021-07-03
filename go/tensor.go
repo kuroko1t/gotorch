@@ -27,7 +27,7 @@ package torch
 import "C"
 //import "log"
 
-type GoTensor struct {
+type Tensor struct {
 	tensor C.Tensor
 	device GoDevice
 }
@@ -36,46 +36,54 @@ type ATensor struct {
 	atensor C.ATensor
 	device GoDevice
 }
-    
-type GoTensors struct {
+
+type Tensors struct {
 	tensors []C.Tensor
 }
 
-func (tensor GoTensor) Size(dim int) int {
+func (atensor ATensor) Value() []float32 {
+	tensor_size := C.AtensorSize(atensor.atensor)
+	tensor_value := make([]float32, int(tensor_size))
+	&tensor_value[0] = C.AtensorToVec(atensor.atensor)
+	//float32vec AtensorToVec(ATensor atensor)
+}
+
+
+func (tensor Tensor) Size(dim int) int {
 	return int(C.tensor_size(tensor.tensor, C.int(dim)))
 }
 
-func (tensor GoTensor) Reshape(shapes []int) GoTensor {
+func (tensor Tensor) Reshape(shapes []int) Tensor {
 	cshapes := make([]C.int, len(shapes))
 	for i, shape := range shapes {
 		cshapes[i] = C.int(shape)
 	}
-	ret_tensor := GoTensor{}
+	ret_tensor := Tensor{}
 	ret_tensor.tensor = C.tensor_reshape(tensor.tensor, &cshapes[0], C.int(len(shapes)))
 	ret_tensor.device = tensor.device
 	return ret_tensor
 }
 
-func (tensor GoTensor) Backward() {
+func (tensor Tensor) Backward() {
 	C.backward(tensor.tensor)
 }
 
-func (tensor GoTensor) Item() float32 {
+func (tensor Tensor) Item() float32 {
 	return float32(C.tensor_item(tensor.tensor))
 }
 
-func (tensor GoTensor) View(shapes []int) GoTensor {
+func (tensor Tensor) View(shapes []int) Tensor {
 	cshapes := make([]C.int, len(shapes))
 	for i, shape := range shapes {
 		cshapes[i] = C.int(shape)
 	}
-	ret_tensor := GoTensor{}
+	ret_tensor := Tensor{}
 	ret_tensor.tensor = C.tensor_view(tensor.tensor, &cshapes[0], C.int(len(shapes)))
 	return ret_tensor
 }
 
-func (tensor *GoTensor) To(device GoDevice) GoTensor {
-	ret_tensor := GoTensor{}
+func (tensor *Tensor) To(device GoDevice) Tensor {
+	ret_tensor := Tensor{}
 	if device.cuda != nil {
 		ret_tensor.tensor = C.tensor_to_cuda(tensor.tensor, device.cuda)
 	} else if device.cpu != nil {
@@ -85,7 +93,7 @@ func (tensor *GoTensor) To(device GoDevice) GoTensor {
 	return ret_tensor
 }
 
-func (tensor GoTensor) Is_cuda() bool {
+func (tensor Tensor) Is_cuda() bool {
 	if C.tensor_is_cuda(tensor.tensor) != 0 {
 		return true
 	} else {
@@ -93,17 +101,17 @@ func (tensor GoTensor) Is_cuda() bool {
 	}
 }
 
-func Randn(shapes []int) GoTensor {
+func Randn(shapes []int) Tensor {
     cshapes := make([]C.int, len(shapes))
 	for i, shape := range shapes {
 		cshapes[i] = C.int(shape)
 	}
-    ret_tensor := GoTensor{}
+    ret_tensor := Tensor{}
     ret_tensor.tensor = C.Randn(&cshapes[0], C.int(len(shapes)))
     return ret_tensor
 }
 
-//func tensor_device_check(tensor GoTensor) {
+//func tensor_device_check(tensor Tensor) {
 // 	if C.tensor_is_cuda(tensor.tensor) != 0 {
 // 		if tensor.device.cuda == nil {
 // 			log.Fatal("Tensor is gpu, but model is cpu")

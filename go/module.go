@@ -27,22 +27,22 @@ package torch
 import "C"
 //import "log"
 
-type GoModule struct {
-	module C.TModule
-}
+//type GoModule struct {
+// 	module C.TModule
+//}
+//
+//type ATensor struct {
+//    attensor C.ATensor
+//}
 
-type ATensor struct {
-    attensor C.ATensor
-}
+//func Load(path string) GoModule{
+//    var module GoModule
+// 	module.module = C.load(C.CString(path))
+//    return module
+//}
 
-func Load(path string) GoModule{
-    var module GoModule
-	module.module = C.load(C.CString(path))
-    return module
-}
-
-func (module GoModule) Forward(inputs ATensor) (output ATensor) {
-    atensor := C.forward_module(module.module, inputs)
-    output.atensor = atensor
-    return output
-}
+//func (module GoModule) Forward(inputs ATensor) (output ATensor) {
+//    atensor := C.forward_module(module.module, inputs)
+//    output.atensor = atensor
+//    return output
+//}
