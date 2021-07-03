@@ -33,8 +33,9 @@ JitModule Load(const char *path) {
   return (void*)module;
 }
 
-ATensor JitForward(JitModule module, Tensor tensor) {
-  torch::Tensor *ori_tensor = (torch::Tensor*)tensor;
+ATensor JitForward(JitModule module, ATensor tensor) {
+  //torch::Tensor *ori_tensor = (torch::Tensor*)tensor;
+  at::Tensor *ori_tensor = (at::Tensor*)tensor;
   torch::jit::script::Module *ori_module = (torch::jit::script::Module*)module;
   at::Tensor *ret_tensor = new at::Tensor();
   std::vector<torch::jit::IValue> input_vec;
@@ -42,12 +43,3 @@ ATensor JitForward(JitModule module, Tensor tensor) {
   *ret_tensor = ori_module->forward(input_vec).toTensor();
   return (void*)ret_tensor;
 }
-
-
-
-
-
-
-
-
-

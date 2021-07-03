@@ -44,8 +44,14 @@ func Load(path string) (GoModule) {
 	return gomodule
 }
 
-func (module GoModule) Forward(input Tensor) GoTensor {
+//func (module GoModule) Forward(input Tensor) GoTensor {
+// 	output := ATensor{}
+// 	output.atensor = C.JitForward(module.module, input.tensor)
+//    return output.toGo()
+//}
+
+func (module GoModule) Forward(input ATensor) GoTensor {
 	output := ATensor{}
-	output.atensor = C.JitForward(module.module, input.tensor)
+	output.atensor = C.JitForward(module.module, input.atensor)
     return output.toGo()
 }

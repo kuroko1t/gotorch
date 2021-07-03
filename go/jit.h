@@ -28,11 +28,10 @@ SOFTWARE.
 extern "C" {
 #endif
   typedef void* JitModule;
-  
+
   JitModule Load(const char *path);
-  ATensor JitForward(JitModule module, Tensor tensor);
+  ATensor JitForward(JitModule module, ATensor tensor);
 
 #ifdef __cplusplus
 }
 #endif
-

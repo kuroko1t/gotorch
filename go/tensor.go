@@ -28,6 +28,7 @@ import "C"
 import (
 	"reflect"
 	"unsafe"
+	"fmt"
 )
 
 // torch::tensor
@@ -67,7 +68,21 @@ func (atensor ATensor) toGo() GoTensor {
 	gotensor := GoTensor{}
 	gotensor.value = tensor_value
 	gotensor.dims = dims
+	fmt.Println("max;", max(tensor_value))
 	return gotensor
+}
+
+func (gotensor GoTensor) Argmax() (int) {
+	max_index := 0
+	var max_value float32
+	for i, v := range gotensor.value {
+		if max_value < v {
+			max_index = i
+			max_value = v
+		}
+	}
+	fmt.Println(max_index, max_value)
+	return max_index
 }
 
 
@@ -124,13 +139,13 @@ func (tensor Tensor) Is_cuda() bool {
 }
 
 func Randn(shapes []int) Tensor {
-    cshapes := make([]C.int, len(shapes))
+	cshapes := make([]C.int, len(shapes))
 	for i, shape := range shapes {
 		cshapes[i] = C.int(shape)
 	}
-    ret_tensor := Tensor{}
-    ret_tensor.tensor = C.Randn(&cshapes[0], C.int(len(shapes)))
-    return ret_tensor
+	ret_tensor := Tensor{}
+	ret_tensor.tensor = C.Randn(&cshapes[0], C.int(len(shapes)))
+	return ret_tensor
 }
 
 //func tensor_device_check(tensor Tensor) {

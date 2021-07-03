@@ -109,7 +109,7 @@ extern "C" {
   int AtensorSize(ATensor atensor);
   size_t AtensorDim(ATensor atensor, size_t dim);
   float* AtensorToVec(ATensor atensor);
-
+  ATensor from_blob(float* data, int* shapes, int size);
 
 #ifdef __cplusplus
 }

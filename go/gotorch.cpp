@@ -365,3 +365,14 @@ float* AtensorToVec(ATensor atensor) {
   //return (void*)v;
   return v->data();
 }
+
+ATensor from_blob(float* data, int* shapes, int size) {
+  std::vector<int64_t> x;
+  for (int i=0; i < size; i++) {
+    x.push_back((int64_t)shapes[i]);
+  }
+  c10::IntArrayRef x1 = c10::IntArrayRef(x);
+  at::Tensor *tensor = new at::Tensor();
+  *tensor = torch::from_blob(data, x1);
+  return tensor;
+}
