@@ -6,7 +6,7 @@ import "fmt"
 func main() {
 	shape := []int{1, 3, 224, 224}
 	tensor := torch.Randn(shape)
-	module := torch.Load("traced_from_pytorch_model.pt")
+	module := torch.Load("resnet_script.pt")
 	output := module.Forward(tensor)
-	fmt.Println(output)
+	fmt.Println(output.Value())
 }
