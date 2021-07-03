@@ -37,11 +37,11 @@ type GoModule struct {
 
 func Load(path string) (GoModule) {
     if _, err := os.Stat(path); os.IsNotExist(err) {
-		log.Fatal("no such a path", path)
-	}
-    gomodule := GoModule{}
-    gomodule.module = C.Load(C.CString(path))
-    return gomodule
+	    log.Fatal("no such a path ", path)
+    }
+	gomodule := GoModule{}
+	gomodule.module = C.Load(C.CString(path))
+	return gomodule
 }
 
 func (module GoModule) Forward(input Tensor) ATensor {
