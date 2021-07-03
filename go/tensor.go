@@ -26,18 +26,13 @@ package torch
 // #include "gotorch.h"
 import "C"
 import (
-    "reflect"
-    "unsafe"
-    "fmt"
+	"reflect"
+	"unsafe"
 )
 
+// torch::tensor
 type Tensor struct {
 	tensor C.Tensor
-	device GoDevice
-}
-
-type ATensor struct {
-	atensor C.ATensor
 	device GoDevice
 }
 
@@ -45,22 +40,34 @@ type Tensors struct {
 	tensors []C.Tensor
 }
 
-func (atensor ATensor) Value() []float32 {
+// at::Tensor
+type ATensor struct {
+	atensor C.ATensor
+	device GoDevice
+}
+
+
+// go slice
+type GoTensor struct {
+	value []float32
+	dims []int
+}
+
+func (atensor ATensor) toGo() GoTensor {
 	tensor_size := (int)(C.AtensorSize(atensor.atensor))
 	tensor_value := make([]float32, tensor_size)
 	h := (*reflect.SliceHeader)((unsafe.Pointer)(&tensor_value))
 	h.Data = (uintptr)((unsafe.Pointer)(C.AtensorToVec(atensor.atensor)))
 	h.Len = tensor_size
 	h.Cap = tensor_size
-	for _, tv := range tensor_value {
-		fmt.Println(tv)
-	}
-	return tensor_value
-	//&tensor_value[0] = C.AtensorToVec(atensor.atensor)
-	//float32vec AtensorToVec(ATensor atensor)
-    //for i, _ := range tensor_value {
-    //    tensor_value[i] = float32(C.AtensorToVec(atensor.atensor)[i])
-    //}
+
+	dim0 := (int)(C.AtensorDim(atensor.atensor, 0))
+	dim1 := (int)(C.AtensorDim(atensor.atensor, 1))
+	dims := []int{dim0, dim1}
+	gotensor := GoTensor{}
+	gotensor.value = tensor_value
+	gotensor.dims = dims
+	return gotensor
 }
 
 
