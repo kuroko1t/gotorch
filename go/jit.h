@@ -21,25 +21,17 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-package torch
 
-// #include "gotorch.h"
-import "C"
+#include <gotorch.h>
 
-type SGD struct {
-	param C.SGD
+#ifdef __cplusplus
+extern "C" {
+#endif
+  typedef void* JitModule;
+
+  JitModule Load(const char *path);
+  ATensor JitForward(JitModule module, ATensor tensor);
+
+#ifdef __cplusplus
 }
-
-func Opimizer(tensors Tensors, lr float32) SGD {
-	sgd := SGD{}
-	sgd.param = C.optimizer_sgd(&tensors.tensors[0], C.float(lr), C.int(len(tensors.tensors)))
-	return sgd
-}
-
-func (sgd SGD) Zero_grad() {
-	C.optimizer_zero_grad(sgd.param)
-}
-
-func (sgd SGD) Step() {
-	C.optimizer_step(sgd.param)
-}
+#endif

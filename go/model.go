@@ -79,11 +79,11 @@ func FeatureDropout() Impl {
 	return impl
 }
 
-func (model GoModel) Parameters() GoTensors {
+func (model GoModel) Parameters() Tensors {
 	var size C.int
 	C.params_size(model.model, &size)
 	tensor_slice := make([]C.Tensor, size, size)
-	tensors := GoTensors{}
+	tensors := Tensors{}
 	C.params(model.model, size, &(tensor_slice[0]))
 	tensors.tensors = tensor_slice
 	return tensors

@@ -23,6 +23,7 @@ SOFTWARE.
 */
 
 #include <torch/torch.h>
+#include <torch/script.h>
 #include <gotorch.h>
 
 struct TorchModel : public torch::nn::Module {
@@ -32,6 +33,16 @@ struct TorchModel : public torch::nn::Module {
 LinearImpl linear(int a, int b) {
   torch::nn::LinearImpl *linear= new torch::nn::LinearImpl(a, b);
   return linear;
+}
+
+Tensor Randn(int* shape, int size) {
+  torch::Tensor *tensor = new torch::Tensor();
+  std::vector<int64_t> x;
+  for (int i=0; i < size; i++) {
+    x.push_back((int64_t)shape[i]);
+  }
+  *tensor = torch::randn(x);
+  return (void*)tensor;
 }
 
 TModel modelInit() {
@@ -288,6 +299,27 @@ void save(TModel model, const char *path) {
   torch::save(t1model, spath);
 }
 
+TModule load(const char *path) {
+  std::string spath(path);
+  torch::jit::script::Module *module = new torch::jit::script::Module();
+  *module = torch::jit::load(spath);
+  return (void*)module;
+}
+
+ATensor forward_module(TModule module, ATensor atensor) {
+  torch::jit::script::Module* tmodule = (torch::jit::script::Module*) module;
+  std::shared_ptr<torch::jit::script::Module> t1module =
+    std::make_shared<torch::jit::script::Module>(*tmodule);
+
+  at::Tensor *t1atensor = (at::Tensor*)atensor;
+  at::Tensor *output = new at::Tensor();
+  std::vector<torch::jit::IValue> inputs;
+  inputs.push_back(*t1atensor);
+  //*output = tmodule->forward({*t1atensor});
+  *output = tmodule->forward(inputs).toTensor();
+  return (void*)output;
+}
+
 int cuda_is_available() {
   return torch::cuda::is_available();
 }
@@ -312,4 +344,35 @@ void model_to_cpu(TModel model, CPU device) {
   TorchModel* tmodel = (TorchModel*) model;
   torch::Device* device_re = (torch::Device*)device;
   tmodel->to(*device_re);
+}
+
+int AtensorSize(ATensor atensor) {
+  at::Tensor *ori_atensor = (at::Tensor*)atensor;
+  return ori_atensor->numel();
+}
+
+size_t AtensorDim(ATensor atensor, size_t dim) {
+  at::Tensor *ori_atensor = (at::Tensor*)atensor;
+  return ori_atensor->size(dim);
+}
+
+float* AtensorToVec(ATensor atensor) {
+  //std::vector<float> *vec = new std::vector<float>();
+  at::Tensor *ori_atensor = (at::Tensor*)atensor;
+  //vec = ori_tensor->data_ptr();
+  //return vec;
+  std::vector<float> *v = new std::vector<float>((*ori_atensor).data_ptr<float>(), (*ori_atensor).data_ptr<float>() + (*ori_atensor).numel());
+  //return (void*)v;
+  return v->data();
+}
+
+ATensor from_blob(float* data, int* shapes, int size) {
+  std::vector<int64_t> x;
+  for (int i=0; i < size; i++) {
+    x.push_back((int64_t)shapes[i]);
+  }
+  c10::IntArrayRef x1 = c10::IntArrayRef(x);
+  at::Tensor *tensor = new at::Tensor();
+  *tensor = torch::from_blob(data, x1);
+  return tensor;
 }

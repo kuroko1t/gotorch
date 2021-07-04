@@ -24,22 +24,34 @@ SOFTWARE.
 package torch
 
 // #include "gotorch.h"
+// #include "jit.h"
 import "C"
+import (
+    "os"
+    "log"
+)
 
-type SGD struct {
-	param C.SGD
+type GoModule struct {
+	module C.JitModule
 }
 
-func Opimizer(tensors Tensors, lr float32) SGD {
-	sgd := SGD{}
-	sgd.param = C.optimizer_sgd(&tensors.tensors[0], C.float(lr), C.int(len(tensors.tensors)))
-	return sgd
+func Load(path string) (GoModule) {
+    if _, err := os.Stat(path); os.IsNotExist(err) {
+	    log.Fatal("no such a path ", path)
+    }
+	gomodule := GoModule{}
+	gomodule.module = C.Load(C.CString(path))
+	return gomodule
 }
 
-func (sgd SGD) Zero_grad() {
-	C.optimizer_zero_grad(sgd.param)
-}
+//func (module GoModule) Forward(input Tensor) GoTensor {
+// 	output := ATensor{}
+// 	output.atensor = C.JitForward(module.module, input.tensor)
+//    return output.toGo()
+//}
 
-func (sgd SGD) Step() {
-	C.optimizer_step(sgd.param)
+func (module GoModule) Forward(input ATensor) GoTensor {
+	output := ATensor{}
+	output.atensor = C.JitForward(module.module, input.atensor)
+    return output.toGo()
 }

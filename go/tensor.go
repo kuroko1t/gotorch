@@ -25,52 +25,99 @@ package torch
 
 // #include "gotorch.h"
 import "C"
-//import "log"
+import (
+	"reflect"
+	"unsafe"
+)
 
-type GoTensor struct {
+// torch::tensor
+type Tensor struct {
 	tensor C.Tensor
 	device GoDevice
 }
 
-type GoTensors struct {
+type Tensors struct {
 	tensors []C.Tensor
 }
 
-func (tensor GoTensor) Size(dim int) int {
+// at::Tensor
+type ATensor struct {
+	atensor C.ATensor
+	device GoDevice
+}
+
+
+// go slice
+type GoTensor struct {
+	value []float32
+	dims []int
+}
+
+func (atensor ATensor) toGo() GoTensor {
+	tensor_size := (int)(C.AtensorSize(atensor.atensor))
+	tensor_value := make([]float32, tensor_size)
+	h := (*reflect.SliceHeader)((unsafe.Pointer)(&tensor_value))
+	h.Data = (uintptr)((unsafe.Pointer)(C.AtensorToVec(atensor.atensor)))
+	h.Len = tensor_size
+	h.Cap = tensor_size
+
+	dim0 := (int)(C.AtensorDim(atensor.atensor, 0))
+	dim1 := (int)(C.AtensorDim(atensor.atensor, 1))
+	dims := []int{dim0, dim1}
+	gotensor := GoTensor{}
+	gotensor.value = tensor_value
+	gotensor.dims = dims
+	return gotensor
+}
+
+func (gotensor GoTensor) Argmax() (int) {
+	max_index := 0
+	var max_value float32
+	for i, v := range gotensor.value {
+		if max_value < v {
+			max_index = i
+			max_value = v
+		}
+	}
+	return max_index
+}
+
+
+func (tensor Tensor) Size(dim int) int {
 	return int(C.tensor_size(tensor.tensor, C.int(dim)))
 }
 
-func (tensor GoTensor) Reshape(shapes []int) GoTensor {
+func (tensor Tensor) Reshape(shapes []int) Tensor {
 	cshapes := make([]C.int, len(shapes))
 	for i, shape := range shapes {
 		cshapes[i] = C.int(shape)
 	}
-	ret_tensor := GoTensor{}
+	ret_tensor := Tensor{}
 	ret_tensor.tensor = C.tensor_reshape(tensor.tensor, &cshapes[0], C.int(len(shapes)))
 	ret_tensor.device = tensor.device
 	return ret_tensor
 }
 
-func (tensor GoTensor) Backward() {
+func (tensor Tensor) Backward() {
 	C.backward(tensor.tensor)
 }
 
-func (tensor GoTensor) Item() float32 {
+func (tensor Tensor) Item() float32 {
 	return float32(C.tensor_item(tensor.tensor))
 }
 
-func (tensor GoTensor) View(shapes []int) GoTensor {
+func (tensor Tensor) View(shapes []int) Tensor {
 	cshapes := make([]C.int, len(shapes))
 	for i, shape := range shapes {
 		cshapes[i] = C.int(shape)
 	}
-	ret_tensor := GoTensor{}
+	ret_tensor := Tensor{}
 	ret_tensor.tensor = C.tensor_view(tensor.tensor, &cshapes[0], C.int(len(shapes)))
 	return ret_tensor
 }
 
-func (tensor *GoTensor) To(device GoDevice) GoTensor {
-	ret_tensor := GoTensor{}
+func (tensor *Tensor) To(device GoDevice) Tensor {
+	ret_tensor := Tensor{}
 	if device.cuda != nil {
 		ret_tensor.tensor = C.tensor_to_cuda(tensor.tensor, device.cuda)
 	} else if device.cpu != nil {
@@ -80,7 +127,7 @@ func (tensor *GoTensor) To(device GoDevice) GoTensor {
 	return ret_tensor
 }
 
-func (tensor GoTensor) Is_cuda() bool {
+func (tensor Tensor) Is_cuda() bool {
 	if C.tensor_is_cuda(tensor.tensor) != 0 {
 		return true
 	} else {
@@ -88,7 +135,17 @@ func (tensor GoTensor) Is_cuda() bool {
 	}
 }
 
-//func tensor_device_check(tensor GoTensor) {
+func Randn(shapes []int) Tensor {
+	cshapes := make([]C.int, len(shapes))
+	for i, shape := range shapes {
+		cshapes[i] = C.int(shape)
+	}
+	ret_tensor := Tensor{}
+	ret_tensor.tensor = C.Randn(&cshapes[0], C.int(len(shapes)))
+	return ret_tensor
+}
+
+//func tensor_device_check(tensor Tensor) {
 // 	if C.tensor_is_cuda(tensor.tensor) != 0 {
 // 		if tensor.device.cuda == nil {
 // 			log.Fatal("Tensor is gpu, but model is cpu")

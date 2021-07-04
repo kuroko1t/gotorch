@@ -35,12 +35,20 @@ extern "C" {
   typedef void* Module;
   typedef void* MnistDataSet;
   typedef void* TModel;
+  typedef void* TModule;
   typedef void* Tensor;
   typedef void* SGD;
   typedef void* ExampleDataSet;
 
   typedef void* CUDA;
   typedef void* CPU;
+
+  typedef void* float32vec;
+
+  /* make tensor */
+
+  Tensor Randn(int* shape, int size);
+  /*******/
 
   TModel modelInit();
   void params_size(TModel model, int *size);
@@ -67,7 +75,7 @@ extern "C" {
 
   int data_loader_size(const char *path, int batch_size);
   void data_loader(const char *path, int batch_size,
-                 Tensor *data_vec, Tensor *target_vec);
+		   Tensor *data_vec, Tensor *target_vec);
 
 
   /* for TensorImpl */
@@ -89,6 +97,7 @@ extern "C" {
   Tensor max_pool2d(Tensor tensor, int kernel_size);
 
   void save(TModel model, const char *path);
+  TModule load(const char *path);
 
   int cuda_is_available();
 
@@ -96,6 +105,12 @@ extern "C" {
   CPU cpu_device();
   void model_to_cuda(TModel model, CUDA device);
   void model_to_cpu(TModel model, CPU device);
+
+  int AtensorSize(ATensor atensor);
+  size_t AtensorDim(ATensor atensor, size_t dim);
+  float* AtensorToVec(ATensor atensor);
+  ATensor from_blob(float* data, int* shapes, int size);
+
 #ifdef __cplusplus
 }
 #endif

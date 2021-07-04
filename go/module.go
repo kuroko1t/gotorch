@@ -25,21 +25,24 @@ package torch
 
 // #include "gotorch.h"
 import "C"
+//import "log"
 
-type SGD struct {
-	param C.SGD
-}
+//type GoModule struct {
+// 	module C.TModule
+//}
+//
+//type ATensor struct {
+//    attensor C.ATensor
+//}
 
-func Opimizer(tensors Tensors, lr float32) SGD {
-	sgd := SGD{}
-	sgd.param = C.optimizer_sgd(&tensors.tensors[0], C.float(lr), C.int(len(tensors.tensors)))
-	return sgd
-}
+//func Load(path string) GoModule{
+//    var module GoModule
+// 	module.module = C.load(C.CString(path))
+//    return module
+//}
 
-func (sgd SGD) Zero_grad() {
-	C.optimizer_zero_grad(sgd.param)
-}
-
-func (sgd SGD) Step() {
-	C.optimizer_step(sgd.param)
-}
+//func (module GoModule) Forward(inputs ATensor) (output ATensor) {
+//    atensor := C.forward_module(module.module, inputs)
+//    output.atensor = atensor
+//    return output
+//}

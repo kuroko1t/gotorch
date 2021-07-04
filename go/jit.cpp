@@ -21,25 +21,24 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-package torch
 
-// #include "gotorch.h"
-import "C"
+#include <torch/torch.h>
+#include <jit.h>
+#include <torch/script.h>
 
-type SGD struct {
-	param C.SGD
+JitModule Load(const char *path) {
+  std::string spath(path);
+  torch::jit::script::Module* module = new torch::jit::script::Module();
+  *module = torch::jit::load(spath);
+  return (void*)module;
 }
 
-func Opimizer(tensors Tensors, lr float32) SGD {
-	sgd := SGD{}
-	sgd.param = C.optimizer_sgd(&tensors.tensors[0], C.float(lr), C.int(len(tensors.tensors)))
-	return sgd
-}
-
-func (sgd SGD) Zero_grad() {
-	C.optimizer_zero_grad(sgd.param)
-}
-
-func (sgd SGD) Step() {
-	C.optimizer_step(sgd.param)
+ATensor JitForward(JitModule module, ATensor tensor) {
+  at::Tensor *ori_tensor = (at::Tensor*)tensor;
+  torch::jit::script::Module *ori_module = (torch::jit::script::Module*)module;
+  at::Tensor *ret_tensor = new at::Tensor();
+  std::vector<torch::jit::IValue> input_vec;
+  input_vec.push_back(*ori_tensor);
+  *ret_tensor = ori_module->forward(input_vec).toTensor();
+  return (void*)ret_tensor;
 }
