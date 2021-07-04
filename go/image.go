@@ -3,14 +3,9 @@ package torch
 // #include "gotorch.h"
 import "C"
 import (
-	"fmt"
 	"image/jpeg"
 	"math"
-	//"encoding/base64"
-	//"image/png"
 	"os"
-	//"io"
-	//"strings"
 	"log"
 )
 
@@ -50,6 +45,17 @@ func max(value []float32) float32 {
 	return max_val
 }
 
+func min(value []float32) float32 {
+	var min_val float32
+	for _, v := range value {
+		if min_val > v {
+			min_val = v
+		}
+	}
+	return min_val
+}
+
+
 func norm(v float32, mean_param, std_param float32) float32 {
 	res := (v - mean_param) / std_param
 	return res
@@ -64,10 +70,9 @@ func (image *Image) Normalize(mean_param []float32, std_param []float32) {
 		image.g[i] = norm(image.g[i], mean_param[1], std_param[1])
 		image.b[i] = norm(image.b[i], mean_param[2], std_param[2])
 	}
-	fmt.Println(len(image.r))
 }
 
-func (image Image) ToTensor() ATensor {
+func (image *Image) ToTensor() ATensor {
 	r_c := make([]C.float, len(image.r))
 	g_c := make([]C.float, len(image.g))
 	b_c := make([]C.float, len(image.b))
@@ -105,12 +110,11 @@ func ImageRead(path string) Image {
 	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
 		for x := bounds.Min.X; x < bounds.Max.X; x++ {
 			r_, g_, b_, _ := img.At(x, y).RGBA()
-			r = append(r, float32(r_/257.0/ 255.0))
-			g = append(g, float32(g_/257.0/ 255.0))
-			b = append(b, float32(b_/257.0/ 255.0))
+			r = append(r, float32(r_)/257.0/ 255.0)
+			g = append(g, float32(g_)/257.0/ 255.0)
+			b = append(b, float32(b_)/257.0/ 255.0)
 		}
 	}
-	fmt.Println(max(r))
 	h := bounds.Max.Y - bounds.Min.Y
 	w := bounds.Max.X - bounds.Min.X
 	return Image{h, w, r, g, b}

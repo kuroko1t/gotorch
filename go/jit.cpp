@@ -34,7 +34,6 @@ JitModule Load(const char *path) {
 }
 
 ATensor JitForward(JitModule module, ATensor tensor) {
-  //torch::Tensor *ori_tensor = (torch::Tensor*)tensor;
   at::Tensor *ori_tensor = (at::Tensor*)tensor;
   torch::jit::script::Module *ori_module = (torch::jit::script::Module*)module;
   at::Tensor *ret_tensor = new at::Tensor();

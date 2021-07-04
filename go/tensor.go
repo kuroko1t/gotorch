@@ -28,7 +28,6 @@ import "C"
 import (
 	"reflect"
 	"unsafe"
-	"fmt"
 )
 
 // torch::tensor
@@ -68,7 +67,6 @@ func (atensor ATensor) toGo() GoTensor {
 	gotensor := GoTensor{}
 	gotensor.value = tensor_value
 	gotensor.dims = dims
-	fmt.Println("max;", max(tensor_value))
 	return gotensor
 }
 
@@ -81,7 +79,6 @@ func (gotensor GoTensor) Argmax() (int) {
 			max_value = v
 		}
 	}
-	fmt.Println(max_index, max_value)
 	return max_index
 }
 
