@@ -27,7 +27,7 @@ $ cd gotorch
 $ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:`pwd`/libtorch/lib
 ```
 
-## Load Torchscript
+## Load Torchscript model
 
 ```golang
 package main
