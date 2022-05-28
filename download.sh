@@ -21,14 +21,14 @@ done
 
 if [ "$FLAG_GPU" ]; then
     if [ ! -e libtorch ]; then
-        wget https://download.pytorch.org/libtorch/cu111/libtorch-cxx11-abi-shared-with-deps-1.8.1%2Bcu111.zip
-        unzip libtorch-cxx11-abi-shared-with-deps-1.8.1+cu111.zip
-	rm -f libtorch-cxx11-abi-shared-with-deps-1.8.1+cu111.zip
+        wget https://download.pytorch.org/libtorch/cu113/libtorch-cxx11-abi-shared-with-deps-1.11.0%2Bcu113.zip
+        unzip libtorch-cxx11-abi-shared-with-deps-1.11.0+cu113.zip
+	rm -f libtorch-cxx11-abi-shared-with-deps-1.11.0+cu113.zip
     fi
 else
     if [ ! -e libtorch ]; then
-	      wget https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-1.8.1%2Bcpu.zip
-        unzip libtorch-cxx11-abi-shared-with-deps-1.8.1+cpu.zip
-	rm -f libtorch-cxx11-abi-shared-with-deps-1.8.1+cpu.zip
+	      wget https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-1.11.0%2Bcpu.zip
+        unzip libtorch-cxx11-abi-shared-with-deps-1.11.0+cpu.zip
+	rm -f libtorch-cxx11-abi-shared-with-deps-1.11.0+cpu.zip
     fi
 fi

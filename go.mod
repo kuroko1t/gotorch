@@ -1,3 +1,3 @@
-module github.com/kuroko1t/gotorch
+module github.com/PrestoBot/gotorch
 
-go 1.13
+go 1.18

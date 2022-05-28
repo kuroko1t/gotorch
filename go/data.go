@@ -36,7 +36,7 @@ import (
 	"sync"
 )
 
-import "github.com/kuroko1t/gotorch/go/common"
+import "github.com/PrestoBot/gotorch/go/common"
 
 type ExampleData struct {
 	dataset C.ExampleDataSet

@@ -100,6 +100,7 @@ extern "C" {
   TModule load(const char *path);
 
   int cuda_is_available();
+  size_t cuda_getDeviceCount();
 
   CUDA cuda_device();
   CPU cpu_device();
