@@ -3,6 +3,6 @@ package torch
 // #include "gotorch.h"
 import "C"
 
-func device_count() uintptr {
+func CudaDeviceCount() uintptr {
 	return C.cuda_getDeviceCount()
 }
