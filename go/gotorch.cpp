@@ -324,6 +324,10 @@ int cuda_is_available() {
   return torch::cuda::is_available();
 }
 
+size_t cuda_getDeviceCount() {
+    return torch::cuda::device_count();
+}
+
 CUDA cuda_device() {
   torch::Device *device = new torch::Device(torch::kCUDA);
   return device;

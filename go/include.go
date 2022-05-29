@@ -1,4 +1,4 @@
-// +build !cpu
+//go:build !cpu
 
 /*
 MIT License
@@ -26,8 +26,7 @@ SOFTWARE.
 package torch
 
 // #cgo CXXFLAGS: -g -D_GLIBCXX_USE_CXX14_ABI=0 -I${SRCDIR} -I$GOTORCH_DIR/libtorch/include/ -I$GOTORCH_DIR/libtorch/include/torch/csrc/api/include/
-// #cgo LDFLAGS: -L${SRCDIR}/../libtorch/lib -lc10 -ltorch -lpthread -lcuda -ltorch_cpu -ltorch_cuda
+// #cgo LDFLAGS: -Wl,--no-as-needed -L${SRCDIR}/../libtorch/lib -lc10 -ltorch -lpthread -lcuda -ltorch_cpu -ltorch_cuda
 // #cgo LDFLAGS: -lpthread -lstdc++
 // #cgo CXXFLAGS: -I${SRCDIR}/../libtorch/include/ -I${SRCDIR}/../libtorch/include/torch/csrc/api/include/ -I${SRCDIR}/../cpp
 import "C"
-
